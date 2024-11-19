@@ -1,5 +1,5 @@
-from abc import abstractmethod
+from abc import ABC
 
 
-class IZMQServerManager:
+class IZMQServerManager(ABC):
     pass

@@ -1,7 +1,7 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
 
-class IDatabaseManager:
+class IDatabaseManager(ABC):
     @abstractmethod
     def connect(self):
         pass
