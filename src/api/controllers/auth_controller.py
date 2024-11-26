@@ -1,27 +1,28 @@
 import os
-from typing import Any, Dict
-import bcrypt
-from pymongo.errors import DuplicateKeyError
 import jwt
+import bcrypt
 import datetime
+from typing import Any, Dict
+from pymongo.errors import DuplicateKeyError
 
 from globals.consts.const_strings import ConstStrings
 from globals.consts.data_errors_messages_const_strings import DataErrorsMessagesConstStrings
 from globals.consts.data_const_strings import DataConstStrings
 from globals.consts.zmq_const_strings import ZMQConstStrings
 from globals.enums.response_status import ResponseStatus
-from models.data_classes.zmq_response import Response
-from models.data_models.auth_model import LoginModel, UserModel
 from globals.consts.database_const_strings import DatabaseConstStrings
+from infrastructures.interfaces.idatabase_manager import IDatabaseManager
+from models.data_classes.zmq_response import Response
+from models.data_models.auth_model import AuthModel
 
 
 class AuthController:
-    def __init__(self, database_manager):
+    def __init__(self, database_manager: IDatabaseManager) -> None:
         self.collection = database_manager.db[DatabaseConstStrings.auth_collection]
 
-    def register(self, user: UserModel) -> Response:
+    def register(self, user: AuthModel) -> Response:
         try:
-            validated_user = UserModel(**user.dict())
+            validated_user = AuthModel(**user.dict())
             existing_user = self._handle_db_operation(
                 self.collection.find_one,
                 {DataConstStrings.email_key: validated_user.email}
@@ -53,9 +54,9 @@ class AuthController:
                 data={ZMQConstStrings.error_message: str(e)}
             )
 
-    def login(self, login_data: LoginModel) -> Response:
+    def login(self, login_data: AuthModel) -> Response:
         try:
-            validated_login = LoginModel(**login_data.dict())
+            validated_login = AuthModel(**login_data.dict())
             user = self._handle_db_operation(
                 self.collection.find_one,
                 {DataConstStrings.email_key: validated_login.email}
@@ -66,17 +67,13 @@ class AuthController:
                     data={
                         ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.incorrect_username_or_password}
                 )
-
-            # אימות הסיסמה
             if not bcrypt.checkpw(validated_login.password.encode(ConstStrings.encode), user[DataConstStrings.password_key].encode(ConstStrings.encode)):
                 return Response(
                     status=ResponseStatus.ERROR,
                     data={
                         ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.incorrect_username_or_password}
                 )
-
             token = self._create_jwt_token(user)
-
             return Response(
                 status=ResponseStatus.SUCCESS,
                 data={
