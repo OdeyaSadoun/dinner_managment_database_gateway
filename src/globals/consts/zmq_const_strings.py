@@ -19,18 +19,22 @@ class ZMQConstStrings:
     unknown_resource_error_message = "Unknown resource"
     unknown_operation_error_message = "Unknown operation"
 
-    # ? Guard operations
-    get_guard_by_id = "get_guard_by_id"
-    get_guards_by_person_id = "get_guards_by_person_id"
-    get_all_guards = "get_all_guards"
-    get_guards_between_dates = "get_guards_between_dates"
-    create_guards = "create_guards"
-    update_guard = "update_guard"
-
     # ? Person operations
     get_all_people = "get_all_people"
     get_person_by_id = "get_person_by_id"
-    get_person_by_personal_number = "get_person_by_personal_number"
     create_person = "create_person"
     update_person = "update_person"
     delete_person = "delete_person"
+    seat_person = "seat_person"
+    
+    # ? Table operations
+    get_all_tables = "get_all_tables"
+    get_table_by_id = "get_table_by_id"
+    create_table = "create_table"
+    update_table = "update_table"
+    delete_table = "delete_table"
+    add_person_to_table = "add_person_to_table"
+    
+    # ? Authorozation operations
+    register = "register"
+    login = "login"

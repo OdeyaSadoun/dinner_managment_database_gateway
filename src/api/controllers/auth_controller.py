@@ -19,7 +19,7 @@ class AuthController:
     def __init__(self, database_manager):
         self.collection = database_manager.db[DatabaseConstStrings.auth_collection]
 
-    def register_user(self, user: UserModel) -> None:
+    def register(self, user: UserModel) -> Response:
         try:
             validated_user = UserModel(**user.dict())
             existing_user = self._handle_db_operation(
@@ -53,7 +53,7 @@ class AuthController:
                 data={ZMQConstStrings.error_message: str(e)}
             )
 
-    def login_user(self, login_data: LoginModel) -> None:
+    def login(self, login_data: LoginModel) -> Response:
         try:
             validated_login = LoginModel(**login_data.dict())
             user = self._handle_db_operation(
