@@ -7,19 +7,17 @@ class DatabaseConstStrings:
     database_name = "DATABASE_NAME"
     default_database_name = "default_db"
 
-    guards_collection = "guards"
     people_collection = "people"
+    tables_collection = "tables"
+    auth_collection = "auth"
 
     # ? operators
     or_operator = "$or"
     gte_operator = "$gte"
     lte_operator = "$lte"
     set_operator = "$set"
+    push_operator = "$push"
 
     # ? indexes
     index_name = "name"
-    commander_id_index = "commander_id_1"
-    deputy_id_index = "deputy_id_1"
-    date_index = "date_1"
-    personal_number_index = "personal_number_1"
     unique_index = "unique"

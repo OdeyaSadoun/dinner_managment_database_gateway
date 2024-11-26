@@ -8,7 +8,7 @@ from globals.consts.consts import Consts
 from globals.consts.const_strings import ConstStrings
 from globals.consts.auth_data_const_strings import AuthDataConstStrings
 from globals.consts.table_data_const_strings import TableDataConstStrings
-from globals.consts.person_data_const_strings import PersonDataConstStrings
+from dinner_managment_database_gateway.src.globals.consts.data_const_strings import PersonDataConstStrings
 from models.managers.mongodb_database_manager import MongoDBDatabaseManager
 from models.managers.zmq_server_manager import ZMQServerManager
 

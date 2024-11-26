@@ -6,13 +6,13 @@ class DataErrorsMessagesConstStrings:
     connection_exception = "Connection to MongoDB failed:"
     connetion_not_established_exception = "Database connection is not established."
 
-    # ? guard exception
-    guard_duplicate_key_exception = "A guard with this ID already exists."
-    guard_id_not_found_exception = "Active guard with the given ID not found."
-    update_guard_exception = "Active guard not found or no changes made."
+    # ? table exception
+    table_duplicate_key_exception = "A table with this id already exists."
+    table_id_not_found_exception = "Active table with the given ID not found."
+    update_table_exception = "Active table not found or no changes made."
 
     # ? person exception
-    person_duplicate_key_exception = "A person with this personal number already exists."
+    person_duplicate_key_exception = "A person with this id already exists."
     person_id_not_found_exception = "Active person with the given ID not found."
     personal_number_not_found_exception = "Active person with personal number not found."
     update_person_exception = "Active person not found or no changes made."
@@ -33,3 +33,7 @@ class DataErrorsMessagesConstStrings:
     validate_must_be_exception = "Must be one of"
     validate_guards_frequency_invalid_guard_exception = "Invalid guards frequency: "
     validate_check_dates_consistency = "Military discharge date must be after the birthday."
+    
+    # ? authorization
+    email_already_exist = "ERROR: email already exist"
+    incorrect_username_or_password = "ERROR: incorrect username or password"

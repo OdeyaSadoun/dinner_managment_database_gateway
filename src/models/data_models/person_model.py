@@ -5,7 +5,7 @@ from typing import Optional, Tuple
 
 from api.validators.person_validators import PersonValidators 
 from globals.consts.const_strings import ConstStrings
-from globals.consts.person_data_const_strings import PersonDataConstStrings
+from globals.consts.data_const_strings import DataConstStrings
 
 
 class PersonModel(BaseModel):
@@ -17,7 +17,7 @@ class PersonModel(BaseModel):
     is_active: bool = Field(default=True)
     date_created: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    @field_validator(PersonDataConstStrings.phone)
+    @field_validator(DataConstStrings.phone_key)
     def validate_phone(cls, value):
         return PersonValidators.validate_phone(value)
 
