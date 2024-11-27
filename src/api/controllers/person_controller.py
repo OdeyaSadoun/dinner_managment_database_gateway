@@ -5,7 +5,7 @@ from pymongo.errors import DuplicateKeyError
 
 from globals.consts.data_errors_messages_const_strings import DataErrorsMessagesConstStrings
 from globals.consts.database_const_strings import DatabaseConstStrings
-from dinner_managment_database_gateway.src.globals.consts.data_const_strings import DataConstStrings
+from globals.consts.data_const_strings import DataConstStrings
 from globals.consts.zmq_const_strings import ZMQConstStrings
 from infrastructures.interfaces.idatabase_manager import IDatabaseManager
 from infrastructures.utils.serialization_util import SerializationUtil

@@ -2,3 +2,5 @@ pandas
 pydantic
 pymongo
 zmq
+jwt
+bcrypt

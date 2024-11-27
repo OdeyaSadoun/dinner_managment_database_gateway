@@ -1,11 +1,12 @@
 import json
 from typing import Dict
+from pydantic import BaseModel
 
 from globals.enums.response_status import ResponseStatus
 from globals.consts.zmq_const_strings import ZMQConstStrings
 
 
-class Response:
+class Response(BaseModel):
     def __init__(self, status: ResponseStatus, data: Dict = {}):
         self.status = status
         self.data = data

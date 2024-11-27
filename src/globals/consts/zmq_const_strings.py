@@ -38,3 +38,8 @@ class ZMQConstStrings:
     # ? Authorozation operations
     register = "register"
     login = "login"
+    
+        # ? Resources
+    auth_resource = "auth"
+    person_resource = "person"
+    table_resource = "table"

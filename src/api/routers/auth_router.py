@@ -7,7 +7,7 @@ from globals.consts.data_const_strings import DataConstStrings
 from globals.consts.zmq_const_strings import ZMQConstStrings
 
 
-class AutnRouter(BaseRouter):
+class AuthRouter(BaseRouter):
     def __init__(self, resource: str, ctrl: IControllerManager) -> None:
         super().__init__(resource, ctrl)
         self._setup_operations()

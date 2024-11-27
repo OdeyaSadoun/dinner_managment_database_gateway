@@ -22,6 +22,7 @@ class PersonModel(BaseModel):
         return PersonValidators.validate_phone(value)
 
     class Config:
+        arbitrary_types_allowed = True
         json_encoders = {
             ObjectId: str,
             datetime: lambda v: v.isoformat(),
