@@ -22,11 +22,12 @@ class AuthController:
 
     def register(self, user: AuthModel) -> Response:
         try:
-            validated_user = AuthModel(**user.dict())
+            validated_user = AuthModel(**user)
             existing_user = self._handle_db_operation(
                 self.collection.find_one,
-                {DataConstStrings.email_key: validated_user.email}
+                {DataConstStrings.username_key: validated_user.username}
             )
+            print("existing_user", existing_user)
             if existing_user:
                 return Response(
                     status=ResponseStatus.ERROR,

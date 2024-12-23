@@ -8,8 +8,8 @@ from globals.consts.const_strings import ConstStrings
 
 class AuthModel(BaseModel):
     id: Optional[ObjectId] = Field(default_factory=ObjectId, alias=ConstStrings.id_before_serialization) 
-    username: str
-    password: str
+    username: str = Field(...)
+    password: str = Field(...)
     is_active: bool = Field(default=True)
     date_created: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
