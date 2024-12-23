@@ -35,5 +35,5 @@ class DataErrorsMessagesConstStrings:
     validate_check_dates_consistency = "Military discharge date must be after the birthday."
     
     # ? authorization
-    email_already_exist = "ERROR: email already exist"
+    username_already_exist = "ERROR: username already exist"
     incorrect_username_or_password = "ERROR: incorrect username or password"

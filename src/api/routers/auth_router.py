@@ -19,11 +19,9 @@ class AuthRouter(BaseRouter):
         }
 
     def register(self, data: Any) -> Response:
-        print("register")
         auth_obj = data.get(DataConstStrings.auth_key)
         return self._ctrl.register(auth_obj)
 
     def login(self, data: Any) -> Response:
-        username = data.get(DataConstStrings.username_key)
-        password = data.get(DataConstStrings.password_key)
-        return self._ctrl.login(username, password)
+        auth_obj = data.get(DataConstStrings.auth_key)
+        return self._ctrl.login(auth_obj)

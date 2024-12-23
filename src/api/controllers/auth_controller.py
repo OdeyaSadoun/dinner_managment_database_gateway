@@ -27,12 +27,11 @@ class AuthController:
                 self.collection.find_one,
                 {DataConstStrings.username_key: validated_user.username}
             )
-            print("existing_user", existing_user)
             if existing_user:
                 return Response(
                     status=ResponseStatus.ERROR,
                     data={
-                        ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.email_already_exist}
+                        ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.username_already_exist}
                 )
             hashed_password = bcrypt.hashpw(validated_user.password.encode(
                 ConstStrings.encode), bcrypt.gensalt())
@@ -57,10 +56,10 @@ class AuthController:
 
     def login(self, login_data: AuthModel) -> Response:
         try:
-            validated_login = AuthModel(**login_data.dict())
+            validated_login = AuthModel(**login_data)
             user = self._handle_db_operation(
                 self.collection.find_one,
-                {DataConstStrings.email_key: validated_login.email}
+                {DataConstStrings.username_key: validated_login.username}
             )
             if not user:
                 return Response(
@@ -80,7 +79,6 @@ class AuthController:
                 data={
                     DataConstStrings.user_id_key: str(user[DataConstStrings.id_key]),
                     DataConstStrings.username_key: user[DataConstStrings.username_key],
-                    DataConstStrings.email_key: user[DataConstStrings.email_key],
                     DataConstStrings.token_key: token
                 }
             )
@@ -102,12 +100,15 @@ class AuthController:
                 f"{DataErrorsMessagesConstStrings.general_exception} {e}")
 
     def _create_jwt_token(self, user: Dict) -> str:
+        try:
+            exp_delta_seconds = int(os.getenv(ConstStrings.jwt_exp_delta_seconds_env_key))
+        except (TypeError, ValueError):
+            raise ValueError("Invalid value for JWT expiration delta seconds")
         payload = {
             DataConstStrings.user_id_key: str(user[DataConstStrings.id_key]),
             DataConstStrings.username_key: user[DataConstStrings.username_key],
-            DataConstStrings.email_key: user[DataConstStrings.email_key],
             DataConstStrings.exp_key: datetime.datetime.now(
-            ) + datetime.timedelta(seconds=os.getenv(ConstStrings.jwt_exp_delta_seconds_env_key))
+            ) + datetime.timedelta(seconds=exp_delta_seconds)
         }
         token = jwt.encode(payload, os.getenv(ConstStrings.jwt_secret_env_key),
                            algorithm=os.getenv(ConstStrings.jwt_algorithm_env_key))
