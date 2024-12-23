@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from globals.consts.zmq_const_strings import ZMQConstStrings
 
 
-class Request(BaseModel):
+class Request:
     def __init__(self, resource: str, operation: str, data: Dict = {}):
         self.resource = resource
         self.operation = operation
