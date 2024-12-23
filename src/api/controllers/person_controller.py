@@ -22,8 +22,8 @@ class PersonController:
     def get_person_by_id(self, person_id: str) -> Response:
         try:
             person = self._handle_db_operation(self.collection.find_one, {
-                DataConstStrings.id: ObjectId(person_id),
-                DataConstStrings.is_active: True
+                DataConstStrings.id_key: ObjectId(person_id),
+                DataConstStrings.is_active_key: True
             })
             if not person:
                 return Response(
@@ -42,7 +42,7 @@ class PersonController:
     
     def get_all_people(self) -> Response:
         try:
-            people = self._handle_db_operation(self.collection.find, {DataConstStrings.is_active: True})
+            people = self._handle_db_operation(self.collection.find, {DataConstStrings.is_active_key: True})
             return Response(
                 status=ResponseStatus.SUCCESS,
                 data={DataConstStrings.people_key: SerializationUtil.serialize_mongo_object(list(people))}
