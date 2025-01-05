@@ -17,6 +17,7 @@ class DatabaseConstStrings:
     lte_operator = "$lte"
     set_operator = "$set"
     push_operator = "$push"
+    pull_operator = "$pull"
 
     # ? indexes
     index_name = "name"

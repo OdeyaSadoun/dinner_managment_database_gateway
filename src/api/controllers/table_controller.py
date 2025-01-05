@@ -63,6 +63,7 @@ class TableController:
             validated_table = TableModel(**table)
             table_data_to_insert = validated_table.model_dump(
                 by_alias=True, exclude_none=True, exclude_unset=False)
+            # table_data_to_insert["position"] = {"x": 0, "y": 0}  
             result = self._handle_db_operation(
                 self.collection.insert_one, table_data_to_insert)
             return Response(
@@ -75,6 +76,47 @@ class TableController:
                 status=ResponseStatus.ERROR,
                 data={ZMQConstStrings.error_message: str(e)}
             )
+
+    def update_table_position(self, table_id: str, position: dict) -> Response:
+        print("position, ctrl, bl", position)
+        result = self._handle_db_operation(
+            self.collection.update_one,
+            {DataConstStrings.id_key: ObjectId(table_id), DataConstStrings.is_active_key: True},
+            {DatabaseConstStrings.set_operator: {"position": position}}
+        )
+        if result.modified_count == 0:
+            return Response(
+                status=ResponseStatus.ERROR,
+                data={ZMQConstStrings.error_message: "Failed to update position"}
+            )
+        return Response(status=ResponseStatus.SUCCESS)
+            
+    def remove_person_from_table(self, table_id: str, person_id: str) -> Response:
+        result = self._handle_db_operation(
+            self.collection.update_one,
+            {DataConstStrings.id_key: ObjectId(table_id), DataConstStrings.is_active_key: True},
+            {DatabaseConstStrings.pull_operator: {"people_list": {"id": ObjectId(person_id)}}}
+        )
+        if result.modified_count == 0:
+            return Response(
+                status=ResponseStatus.ERROR,
+                data={ZMQConstStrings.error_message: "Failed to remove person from table"}
+            )
+        return Response(status=ResponseStatus.SUCCESS)
+
+    def add_person_to_table(self, table_id: str, person_id: str) -> Response:
+        result = self._handle_db_operation(
+            self.collection.update_one,
+            {DataConstStrings.id_key: ObjectId(table_id), DataConstStrings.is_active_key: True},
+            {DatabaseConstStrings.push_operator: {"people_list": ObjectId(person_id)}}
+        )
+        if result.modified_count == 0:
+            return Response(
+                status=ResponseStatus.ERROR,
+                data={ZMQConstStrings.error_message: "Failed to add person to table"}
+            )
+        return Response(status=ResponseStatus.SUCCESS)
+
 
     def update_table(self, table_id: str, table: TableModel) -> None:
         try:

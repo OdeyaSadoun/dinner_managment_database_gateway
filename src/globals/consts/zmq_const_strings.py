@@ -32,8 +32,10 @@ class ZMQConstStrings:
     get_table_by_id = "get_table_by_id"
     create_table = "create_table"
     update_table = "update_table"
+    update_table_position = "update_table_position"
     delete_table = "delete_table"
     add_person_to_table = "add_person_to_table"
+    remove_person_from_table = "remove_person_from_table"
     
     # ? Authorozation operations
     register = "register"
