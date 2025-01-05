@@ -78,7 +78,6 @@ class TableController:
             )
 
     def update_table_position(self, table_id: str, position: dict) -> Response:
-        print("position, ctrl, bl", position)
         result = self._handle_db_operation(
             self.collection.update_one,
             {DataConstStrings.id_key: ObjectId(table_id), DataConstStrings.is_active_key: True},
@@ -95,7 +94,7 @@ class TableController:
         result = self._handle_db_operation(
             self.collection.update_one,
             {DataConstStrings.id_key: ObjectId(table_id), DataConstStrings.is_active_key: True},
-            {DatabaseConstStrings.pull_operator: {"people_list": {"id": ObjectId(person_id)}}}
+            {DatabaseConstStrings.pull_operator: {"people_list": ObjectId(person_id)}}
         )
         if result.modified_count == 0:
             return Response(
