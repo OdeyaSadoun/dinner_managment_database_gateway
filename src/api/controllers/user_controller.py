@@ -74,13 +74,12 @@ class UserController:
                     data={
                         ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.incorrect_username_or_password}
                 )
-            token = self._create_jwt_token(user)
             return Response(
                 status=ResponseStatus.SUCCESS,
                 data={
                     DataConstStrings.user_id_key: str(user[DataConstStrings.id_key]),
                     DataConstStrings.username_key: user[DataConstStrings.username_key],
-                    DataConstStrings.token_key: token
+                    "role": user["role"]
                 }
             )
 
