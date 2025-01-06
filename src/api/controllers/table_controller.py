@@ -63,7 +63,6 @@ class TableController:
             validated_table = TableModel(**table)
             table_data_to_insert = validated_table.model_dump(
                 by_alias=True, exclude_none=True, exclude_unset=False)
-            # table_data_to_insert["position"] = {"x": 0, "y": 0}  
             result = self._handle_db_operation(
                 self.collection.insert_one, table_data_to_insert)
             return Response(
@@ -115,7 +114,6 @@ class TableController:
                 data={ZMQConstStrings.error_message: "Failed to add person to table"}
             )
         return Response(status=ResponseStatus.SUCCESS)
-
 
     def update_table(self, table_id: str, table: TableModel) -> None:
         try:

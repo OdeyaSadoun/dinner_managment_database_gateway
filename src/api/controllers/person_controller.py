@@ -99,7 +99,7 @@ class PersonController:
                 {DataConstStrings.id_key: ObjectId(person_id), DataConstStrings.is_active_key: True},
                 {DatabaseConstStrings.set_operator: {DataConstStrings.is_reach_the_dinner_key: True}}
             )
-            if result.modified_count == 0:
+            if result.nModified == 0:
                 return Response(
                     status=ResponseStatus.ERROR,
                     data={ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.person_id_not_found_exception}
@@ -112,6 +112,27 @@ class PersonController:
                 status=ResponseStatus.ERROR,
                 data={ZMQConstStrings.error_message: str(e)}
             )
+            
+    def unseat_person(self, person_id: str) -> None:
+        try:
+            result = self._handle_db_operation(
+                self.collection.update_one,
+                {DataConstStrings.id_key: ObjectId(person_id), DataConstStrings.is_active_key: True},
+                {DatabaseConstStrings.set_operator: {DataConstStrings.is_reach_the_dinner_key: False}}
+            )
+            if result.nModified == 0:
+                return Response(
+                    status=ResponseStatus.ERROR,
+                    data={ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.person_id_not_found_exception}
+                )
+            return Response(
+                status=ResponseStatus.SUCCESS
+            )
+        except Exception as e:
+            return Response(
+                status=ResponseStatus.ERROR,
+                data={ZMQConstStrings.error_message: str(e)}
+            )            
             
     def delete_person(self, person_id: str) -> None:
         try:

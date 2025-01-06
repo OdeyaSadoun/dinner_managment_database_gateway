@@ -26,6 +26,7 @@ class ZMQConstStrings:
     update_person = "update_person"
     delete_person = "delete_person"
     seat_person = "seat_person"
+    unseat_person = "unseat_person"
     
     # ? Table operations
     get_all_tables = "get_all_tables"

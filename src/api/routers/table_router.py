@@ -43,7 +43,6 @@ class TableRouter(BaseRouter):
     def update_table_position(self, data: Any) -> Response:
         table_id = data.get(DataConstStrings.table_id_key)
         position = data.get(DataConstStrings.position_key)
-        print("position, router, db", position)
         return self._ctrl.update_table_position(table_id, position)
 
     def delete_table(self, data: Any) -> Response:

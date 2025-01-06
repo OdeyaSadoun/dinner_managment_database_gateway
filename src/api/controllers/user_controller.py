@@ -4,6 +4,7 @@ import bcrypt
 import datetime
 from typing import Any, Dict
 from pymongo.errors import DuplicateKeyError
+from bson import ObjectId
 
 from models.data_classes.login_user import LoginUser
 from globals.consts.const_strings import ConstStrings
@@ -57,7 +58,6 @@ class UserController:
 
     def login(self, login_data: LoginUser) -> Response:
         try:
-            print("login_data", login_data)
             user = self._handle_db_operation(
                 self.collection.find_one,
                 {DataConstStrings.username_key: login_data.get(DataConstStrings.username_key)}
@@ -90,6 +90,17 @@ class UserController:
                 data={ZMQConstStrings.error_message: str(e)}
             )
 
+    def get_user_by_username(self, username: str):
+        user = self.collection.find_one({DataConstStrings.username_key: username})
+        return user
+
+    def update_user_role(self, user_id: str, role: str):
+        result = self.collection.update_one(
+            {DataConstStrings.id_key: ObjectId(user_id), DataConstStrings.is_active_key: True},
+            {DatabaseConstStrings.set_operator: {"role": role}}
+        )
+        return result.modified_count > 0
+    
     def _handle_db_operation(self, operation, *args, **kwargs) -> Any:
         try:
             return operation(*args, **kwargs)
