@@ -1,8 +1,8 @@
 import os
-from api.controllers.auth_controller import AuthController
+from api.controllers.user_controller import UserController
 from api.controllers.table_controller import TableController
 from api.controllers.person_controller import PersonController
-from api.routers.auth_router import AuthRouter
+from api.routers.user_router import UserRouter
 from api.routers.table_router import TableRouter
 from api.routers.person_router import PersonRouter
 from globals.consts.zmq_const_strings import ZMQConstStrings
@@ -28,16 +28,16 @@ class Factory:
         return TableRouter(ZMQConstStrings.table_resource, table_controller)
     
     @staticmethod
-    def create_auth_router(database_manager):
-        auth_controller = AuthController(database_manager)
-        return AuthRouter(ZMQConstStrings.auth_resource, auth_controller)
+    def create_user_router(database_manager):
+        user_controller = UserController(database_manager)
+        return UserRouter(ZMQConstStrings.auth_resource, user_controller)
     
     @staticmethod    
     def create_routers(database_manager):
         return [
             Factory.create_person_router(database_manager),
             Factory.create_table_router(database_manager),
-            Factory.create_auth_router(database_manager)
+            Factory.create_user_router(database_manager)
         ]
     
     @staticmethod

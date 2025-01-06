@@ -9,8 +9,8 @@ class DatabaseConstStrings:
 
     people_collection = "people"
     tables_collection = "tables"
-    auth_collection = "auth"
-
+    users_collection = "users"
+    
     # ? operators
     or_operator = "$or"
     gte_operator = "$gte"

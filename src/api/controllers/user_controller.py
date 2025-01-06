@@ -5,6 +5,7 @@ import datetime
 from typing import Any, Dict
 from pymongo.errors import DuplicateKeyError
 
+from models.data_classes.login_user import LoginUser
 from globals.consts.const_strings import ConstStrings
 from globals.consts.data_errors_messages_const_strings import DataErrorsMessagesConstStrings
 from globals.consts.data_const_strings import DataConstStrings
@@ -13,16 +14,16 @@ from globals.enums.response_status import ResponseStatus
 from globals.consts.database_const_strings import DatabaseConstStrings
 from infrastructures.interfaces.idatabase_manager import IDatabaseManager
 from models.data_classes.zmq_response import Response
-from models.data_models.auth_model import AuthModel
+from models.data_models.user_model import UserModel
 
 
-class AuthController:
+class UserController:
     def __init__(self, database_manager: IDatabaseManager) -> None:
-        self.collection = database_manager.db[DatabaseConstStrings.auth_collection]
+        self.collection = database_manager.db[DatabaseConstStrings.users_collection]
 
-    def register(self, user: AuthModel) -> Response:
+    def register(self, user: UserModel) -> Response:
         try:
-            validated_user = AuthModel(**user)
+            validated_user = UserModel(**user)
             existing_user = self._handle_db_operation(
                 self.collection.find_one,
                 {DataConstStrings.username_key: validated_user.username}
@@ -54,12 +55,12 @@ class AuthController:
                 data={ZMQConstStrings.error_message: str(e)}
             )
 
-    def login(self, login_data: AuthModel) -> Response:
+    def login(self, login_data: LoginUser) -> Response:
         try:
-            validated_login = AuthModel(**login_data)
+            print("login_data", login_data)
             user = self._handle_db_operation(
                 self.collection.find_one,
-                {DataConstStrings.username_key: validated_login.username}
+                {DataConstStrings.username_key: login_data.get(DataConstStrings.username_key)}
             )
             if not user:
                 return Response(
@@ -67,7 +68,7 @@ class AuthController:
                     data={
                         ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.incorrect_username_or_password}
                 )
-            if not bcrypt.checkpw(validated_login.password.encode(ConstStrings.encode), user[DataConstStrings.password_key].encode(ConstStrings.encode)):
+            if not bcrypt.checkpw(login_data.get(DataConstStrings.password_key).encode(ConstStrings.encode), user[DataConstStrings.password_key].encode(ConstStrings.encode)):
                 return Response(
                     status=ResponseStatus.ERROR,
                     data={
