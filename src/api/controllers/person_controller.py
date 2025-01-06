@@ -99,7 +99,7 @@ class PersonController:
                 {DataConstStrings.id_key: ObjectId(person_id), DataConstStrings.is_active_key: True},
                 {DatabaseConstStrings.set_operator: {DataConstStrings.is_reach_the_dinner_key: True}}
             )
-            if result.nModified == 0:
+            if result.modified_count == 0:
                 return Response(
                     status=ResponseStatus.ERROR,
                     data={ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.person_id_not_found_exception}
@@ -120,7 +120,7 @@ class PersonController:
                 {DataConstStrings.id_key: ObjectId(person_id), DataConstStrings.is_active_key: True},
                 {DatabaseConstStrings.set_operator: {DataConstStrings.is_reach_the_dinner_key: False}}
             )
-            if result.nModified == 0:
+            if result.modified_count == 0:
                 return Response(
                     status=ResponseStatus.ERROR,
                     data={ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.person_id_not_found_exception}

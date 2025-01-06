@@ -166,36 +166,37 @@ class TableController:
                 data={ZMQConstStrings.error_message: str(e)}
             )
 
-    def add_person_to_table(self, table_id: str, person_id: str) -> None:
-        try:
-            person_object_id = ObjectId(person_id)
-            result = self._handle_db_operation(
-                self.collection.update_one,
-                {
-                    DataConstStrings.id_key: ObjectId(table_id),
-                    DataConstStrings.is_active_key: True
-                },
-                {
-                    DatabaseConstStrings.push_operator: {
-                        "people_list": person_object_id}
-                }
-            )
-            if result.modified_count == 0:
-                return Response(
-                    status=ResponseStatus.ERROR,
-                    data={
-                        ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.update_table_exception}
-                )
+    # def add_person_to_table(self, table_id: str, person_id: str) -> None:
+    #     try:
+    #         print("add person")
+    #         person_object_id = ObjectId(person_id)
+    #         result = self._handle_db_operation(
+    #             self.collection.update_one,
+    #             {
+    #                 DataConstStrings.id_key: ObjectId(table_id),
+    #                 DataConstStrings.is_active_key: True
+    #             },
+    #             {
+    #                 DatabaseConstStrings.push_operator: {
+    #                     "people_list": person_object_id}
+    #             }
+    #         )
+    #         if result.modified_count == 0:
+    #             return Response(
+    #                 status=ResponseStatus.ERROR,
+    #                 data={
+    #                     ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.update_table_exception}
+    #             )
 
-            return Response(
-                status=ResponseStatus.SUCCESS
-            )
+    #         return Response(
+    #             status=ResponseStatus.SUCCESS
+    #         )
 
-        except Exception as e:
-            return Response(
-                status=ResponseStatus.ERROR,
-                data={ZMQConstStrings.error_message: str(e)}
-            )
+    #     except Exception as e:
+    #         return Response(
+    #             status=ResponseStatus.ERROR,
+    #             data={ZMQConstStrings.error_message: str(e)}
+    #         )
 
     # def _ensure_indexes_creation(self) -> None:
     #     existing_indexes = [index[DatabaseConstStrings.index_name] for index in self.collection.list_indexes()]
