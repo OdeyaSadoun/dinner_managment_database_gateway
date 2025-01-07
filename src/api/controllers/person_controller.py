@@ -60,7 +60,10 @@ class PersonController:
             result = self._handle_db_operation(self.collection.insert_one, person_data_to_insert)
             return Response(
                 status=ResponseStatus.SUCCESS,
-                data={DataConstStrings.inserted_id_key: str(result.inserted_id)}
+                data={DataConstStrings.id_key: str(result.inserted_id),
+                      "name": validated_person.name,
+                      "phone": validated_person.phone,
+                      "table_number": validated_person.table_number}
             )
         except Exception as e:
             return Response(
