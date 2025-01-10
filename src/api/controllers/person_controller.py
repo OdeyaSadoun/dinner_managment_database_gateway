@@ -1,6 +1,6 @@
 from typing import Any
 from bson import ObjectId
-import pymongo  
+import pymongo
 from pymongo.errors import DuplicateKeyError
 
 from globals.consts.data_errors_messages_const_strings import DataErrorsMessagesConstStrings
@@ -28,24 +28,28 @@ class PersonController:
             if not person:
                 return Response(
                     status=ResponseStatus.ERROR,
-                    data={ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.person_id_not_found_exception}
+                    data={
+                        ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.person_id_not_found_exception}
                 )
             return Response(
                 status=ResponseStatus.SUCCESS,
-                data={DataConstStrings.person_key: SerializationUtil.serialize_mongo_object(person)}
+                data={
+                    DataConstStrings.person_key: SerializationUtil.serialize_mongo_object(person)}
             )
         except Exception as e:
             return Response(
                 status=ResponseStatus.ERROR,
                 data={ZMQConstStrings.error_message: str(e)}
             )
-    
+
     def get_all_people(self) -> Response:
         try:
-            people = self._handle_db_operation(self.collection.find, {DataConstStrings.is_active_key: True})
+            people = self._handle_db_operation(
+                self.collection.find, {DataConstStrings.is_active_key: True})
             return Response(
                 status=ResponseStatus.SUCCESS,
-                data={DataConstStrings.people_key: SerializationUtil.serialize_mongo_object(list(people))}
+                data={DataConstStrings.people_key: SerializationUtil.serialize_mongo_object(
+                    list(people))}
             )
         except Exception as e:
             return Response(
@@ -55,9 +59,13 @@ class PersonController:
 
     def create_person(self, person: PersonModel) -> None:
         try:
+            print("person", person)
             validated_person = PersonModel(**person)
-            person_data_to_insert = validated_person.model_dump(by_alias=True, exclude_none=True, exclude_unset=False)
-            result = self._handle_db_operation(self.collection.insert_one, person_data_to_insert)
+            print("validated_person", validated_person)
+            person_data_to_insert = validated_person.model_dump(
+                by_alias=True, exclude_none=True, exclude_unset=False)
+            result = self._handle_db_operation(
+                self.collection.insert_one, person_data_to_insert)
             return Response(
                 status=ResponseStatus.SUCCESS,
                 data={DataConstStrings.id_key: str(result.inserted_id),
@@ -74,17 +82,20 @@ class PersonController:
     def update_person(self, person_id: str, person: PersonModel) -> None:
         try:
             validated_person = PersonModel(**person)
-            person_data_to_update = validated_person.model_dump(by_alias=True, exclude_none=True, exclude_unset=False)
+            person_data_to_update=validated_person.model_dump(
+                by_alias=True, exclude_none=True, exclude_unset=False)
             person_data_to_update.pop(DataConstStrings.id_key, None)
-            result = self._handle_db_operation(
-                self.collection.update_one, 
-                {DataConstStrings.id_key: ObjectId(person_id), DataConstStrings.is_active_key: True},
+            result=self._handle_db_operation(
+                self.collection.update_one,
+                {DataConstStrings.id_key: ObjectId(
+                    person_id), DataConstStrings.is_active_key: True},
                 {DatabaseConstStrings.set_operator: person_data_to_update}
             )
             if result.modified_count == 0:
                 return Response(
                     status=ResponseStatus.ERROR,
-                    data={ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.update_person_exception}
+                    data={
+                        ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.update_person_exception}
                 )
             return Response(
                 status=ResponseStatus.SUCCESS
@@ -94,18 +105,21 @@ class PersonController:
                 status=ResponseStatus.ERROR,
                 data={ZMQConstStrings.error_message: str(e)}
             )
-    
+
     def seat_person(self, person_id: str) -> None:
         try:
-            result = self._handle_db_operation(
+            result=self._handle_db_operation(
                 self.collection.update_one,
-                {DataConstStrings.id_key: ObjectId(person_id), DataConstStrings.is_active_key: True},
-                {DatabaseConstStrings.set_operator: {DataConstStrings.is_reach_the_dinner_key: True}}
+                {DataConstStrings.id_key: ObjectId(
+                    person_id), DataConstStrings.is_active_key: True},
+                {DatabaseConstStrings.set_operator: {
+                    DataConstStrings.is_reach_the_dinner_key: True}}
             )
             if result.modified_count == 0:
                 return Response(
                     status=ResponseStatus.ERROR,
-                    data={ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.person_id_not_found_exception}
+                    data={
+                        ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.person_id_not_found_exception}
                 )
             return Response(
                 status=ResponseStatus.SUCCESS
@@ -115,18 +129,21 @@ class PersonController:
                 status=ResponseStatus.ERROR,
                 data={ZMQConstStrings.error_message: str(e)}
             )
-            
+
     def unseat_person(self, person_id: str) -> None:
         try:
-            result = self._handle_db_operation(
+            result=self._handle_db_operation(
                 self.collection.update_one,
-                {DataConstStrings.id_key: ObjectId(person_id), DataConstStrings.is_active_key: True},
-                {DatabaseConstStrings.set_operator: {DataConstStrings.is_reach_the_dinner_key: False}}
+                {DataConstStrings.id_key: ObjectId(
+                    person_id), DataConstStrings.is_active_key: True},
+                {DatabaseConstStrings.set_operator: {
+                    DataConstStrings.is_reach_the_dinner_key: False}}
             )
             if result.modified_count == 0:
                 return Response(
                     status=ResponseStatus.ERROR,
-                    data={ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.person_id_not_found_exception}
+                    data={
+                        ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.person_id_not_found_exception}
                 )
             return Response(
                 status=ResponseStatus.SUCCESS
@@ -135,19 +152,22 @@ class PersonController:
             return Response(
                 status=ResponseStatus.ERROR,
                 data={ZMQConstStrings.error_message: str(e)}
-            )            
-            
+            )
+
     def delete_person(self, person_id: str) -> None:
         try:
-            result = self._handle_db_operation(
+            result=self._handle_db_operation(
                 self.collection.update_one,
-                {DataConstStrings.id_key: ObjectId(person_id), DataConstStrings.is_active_key: True},
-                {DatabaseConstStrings.set_operator: {DataConstStrings.is_active_key: False}}
+                {DataConstStrings.id_key: ObjectId(
+                    person_id), DataConstStrings.is_active_key: True},
+                {DatabaseConstStrings.set_operator: {
+                    DataConstStrings.is_active_key: False}}
             )
             if not result.modified_count:
                 return Response(
                     status=ResponseStatus.ERROR,
-                    data={ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.person_id_not_found_exception}
+                    data={
+                        ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.person_id_not_found_exception}
                 )
             return Response(
                 status=ResponseStatus.SUCCESS
@@ -157,7 +177,7 @@ class PersonController:
                 status=ResponseStatus.ERROR,
                 data={ZMQConstStrings.error_message: str(e)}
             )
-        
+
     # def _ensure_indexes_creation(self) -> None:
     #     existing_indexes = [index[DatabaseConstStrings.index_name] for index in self.collection.list_indexes()]
     #     indexes_to_ensure = [
@@ -171,6 +191,8 @@ class PersonController:
         try:
             return operation(*args, **kwargs)
         except DuplicateKeyError:
-            raise ValueError(DataErrorsMessagesConstStrings.person_duplicate_key_exception)
+            raise ValueError(
+                DataErrorsMessagesConstStrings.person_duplicate_key_exception)
         except Exception as e:
-            raise Exception(f"{DataErrorsMessagesConstStrings.general_exception} {e}")
+            raise Exception(
+                f"{DataErrorsMessagesConstStrings.general_exception} {e}")

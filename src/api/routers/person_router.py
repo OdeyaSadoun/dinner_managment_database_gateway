@@ -39,12 +39,10 @@ class PersonRouter(BaseRouter):
         return self._ctrl.update_person(person_id, person)
 
     def seat_person(self, data: Any) -> Response:
-        print("seat")
         person_id = data.get(DataConstStrings.person_id_key)
         return self._ctrl.seat_person(person_id)    
 
     def unseat_person(self, data: Any) -> Response:
-        print("unseat router")
         person_id = data.get(DataConstStrings.person_id_key)
         return self._ctrl.unseat_person(person_id)
 
