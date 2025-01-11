@@ -37,3 +37,6 @@ class DataErrorsMessagesConstStrings:
     # ? authorization
     username_already_exist = "ERROR: username already exist"
     incorrect_username_or_password = "ERROR: incorrect username or password"
+    
+    user_id_not_found_exception = "user id not found exception"
+    user_not_found = "user not found"

@@ -166,47 +166,6 @@ class TableController:
                 data={ZMQConstStrings.error_message: str(e)}
             )
 
-    # def add_person_to_table(self, table_id: str, person_id: str) -> None:
-    #     try:
-    #         print("add person")
-    #         person_object_id = ObjectId(person_id)
-    #         result = self._handle_db_operation(
-    #             self.collection.update_one,
-    #             {
-    #                 DataConstStrings.id_key: ObjectId(table_id),
-    #                 DataConstStrings.is_active_key: True
-    #             },
-    #             {
-    #                 DatabaseConstStrings.push_operator: {
-    #                     "people_list": person_object_id}
-    #             }
-    #         )
-    #         if result.modified_count == 0:
-    #             return Response(
-    #                 status=ResponseStatus.ERROR,
-    #                 data={
-    #                     ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.update_table_exception}
-    #             )
-
-    #         return Response(
-    #             status=ResponseStatus.SUCCESS
-    #         )
-
-    #     except Exception as e:
-    #         return Response(
-    #             status=ResponseStatus.ERROR,
-    #             data={ZMQConstStrings.error_message: str(e)}
-    #         )
-
-    # def _ensure_indexes_creation(self) -> None:
-    #     existing_indexes = [index[DatabaseConstStrings.index_name] for index in self.collection.list_indexes()]
-    #     indexes_to_ensure = [
-    #         (DataConstStrings.personal_number, {DatabaseConstStrings.index_name: DatabaseConstStrings.personal_number_index, DatabaseConstStrings.unique_index: True})
-    #     ]
-    #     for field, options in indexes_to_ensure:
-    #         if options[DatabaseConstStrings.index_name] not in existing_indexes:
-    #             self.collection.create_index([(field, pymongo.ASCENDING)], **options)
-
     def _handle_db_operation(self, operation, *args, **kwargs) -> Any:
         try:
             return operation(*args, **kwargs)

@@ -88,18 +88,113 @@ class UserController:
                 status=ResponseStatus.ERROR,
                 data={ZMQConstStrings.error_message: str(e)}
             )
-
-    def get_user_by_username(self, username: str):
-        user = self.collection.find_one({DataConstStrings.username_key: username})
-        return user
-
-    def update_user_role(self, user_id: str, role: str):
-        result = self.collection.update_one(
-            {DataConstStrings.id_key: ObjectId(user_id), DataConstStrings.is_active_key: True},
-            {DatabaseConstStrings.set_operator: {"role": role}}
-        )
-        return result.modified_count > 0
     
+    def get_all_users(self) -> Response:
+        try:
+            users = list(self._handle_db_operation(self.collection.find))
+            # הסרת הסיסמה מהרשומות
+            for user in users:
+                user.pop(DataConstStrings.password_key, None)
+                user[DataConstStrings.id_key] = str(user[DataConstStrings.id_key])
+            return Response(
+                status=ResponseStatus.SUCCESS,
+                data={DataConstStrings.users_key: users}
+            )
+        except Exception as e:
+            return Response(
+                status=ResponseStatus.ERROR,
+                data={ZMQConstStrings.error_message: str(e)}
+            )
+
+    def get_user_by_id(self, user_id: str) -> Response:
+        try:
+            user = self._handle_db_operation(self.collection.find_one, {DataConstStrings.id_key: ObjectId(user_id)})
+            if not user:
+                return Response(
+                    status=ResponseStatus.ERROR,
+                    data={ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.user_not_found}
+                )
+            user.pop(DataConstStrings.password_key, None)
+            user[DataConstStrings.id_key] = str(user[DataConstStrings.id_key])
+            return Response(
+                status=ResponseStatus.SUCCESS,
+                data={DataConstStrings.user_key: user}
+            )
+        except Exception as e:
+            return Response(
+                status=ResponseStatus.ERROR,
+                data={ZMQConstStrings.error_message: str(e)}
+            )
+
+    def get_user_by_username_and_password(self, username: str, password: str) -> Response:
+        try:
+            user = self._handle_db_operation(self.collection.find_one, {DataConstStrings.username_key: username})
+            if not user or not bcrypt.checkpw(password.encode(ConstStrings.encode), user[DataConstStrings.password_key].encode(ConstStrings.encode)):
+                return Response(
+                    status=ResponseStatus.ERROR,
+                    data={ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.incorrect_username_or_password}
+                )
+            user.pop(DataConstStrings.password_key, None)
+            user[DataConstStrings.id_key] = str(user[DataConstStrings.id_key])
+            return Response(
+                status=ResponseStatus.SUCCESS,
+                data={DataConstStrings.user_key: user}
+            )
+        except Exception as e:
+            return Response(
+                status=ResponseStatus.ERROR,
+                data={ZMQConstStrings.error_message: str(e)}
+            )
+    
+    def delete_user(self, user_id: str) -> None:
+        try:
+            result = self._handle_db_operation(
+                self.collection.update_one,
+                {DataConstStrings.id_key: ObjectId(
+                    user_id), DataConstStrings.is_active_key: True},
+                {DatabaseConstStrings.set_operator: {
+                    DataConstStrings.is_active_key: False}}
+            )
+            if not result.modified_count:
+                return Response(
+                    status=ResponseStatus.ERROR,
+                    data={
+                        ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.user_id_not_found_exception}
+                )
+            return Response(
+                status=ResponseStatus.SUCCESS
+            )
+        except Exception as e:
+            return Response(
+                status=ResponseStatus.ERROR,
+                data={ZMQConstStrings.error_message: str(e)}
+            )
+
+    def update_user(self, user_id: str, updated_user_data: Dict) -> Response:
+        try:
+            if DataConstStrings.password_key in updated_user_data:
+                hashed_password = bcrypt.hashpw(updated_user_data[DataConstStrings.password_key].encode(ConstStrings.encode), bcrypt.gensalt())
+                updated_user_data[DataConstStrings.password_key] = hashed_password.decode(ConstStrings.encode)
+            result = self._handle_db_operation(
+                self.collection.update_one,
+                {DataConstStrings.id_key: ObjectId(user_id)},
+                {DatabaseConstStrings.set_operator: updated_user_data}
+            )
+            if result.matched_count == 0:
+                return Response(
+                    status=ResponseStatus.ERROR,
+                    data={ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.user_not_found}
+                )
+            return Response(
+                status=ResponseStatus.SUCCESS,
+                data={DataConstStrings.id_key: user_id}
+            )
+        except Exception as e:
+            return Response(
+                status=ResponseStatus.ERROR,
+                data={ZMQConstStrings.error_message: str(e)}
+            )
+
     def _handle_db_operation(self, operation, *args, **kwargs) -> Any:
         try:
             return operation(*args, **kwargs)

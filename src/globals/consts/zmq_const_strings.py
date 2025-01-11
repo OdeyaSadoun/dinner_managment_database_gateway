@@ -41,6 +41,11 @@ class ZMQConstStrings:
     # ? Authorozation operations
     register = "register"
     login = "login"
+    get_all_users = "get_all_users"
+    get_user_by_id = "get_user_by_id"
+    get_user_by_username_and_password = "get_user_by_username_and_password"
+    delete_user = "delete_user"
+    update_user = "update_user"
     
         # ? Resources
     auth_resource = "auth"
