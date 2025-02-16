@@ -1,7 +1,7 @@
 from bson import ObjectId
 from datetime import datetime, timezone
 from pydantic import BaseModel, Field, field_validator, model_validator
-from typing import Optional, Tuple
+from typing import Literal, Optional, Tuple
 
 from api.validators.person_validators import PersonValidators 
 from globals.consts.const_strings import ConstStrings
@@ -14,6 +14,9 @@ class PersonModel(BaseModel):
     phone: str = Field(...)
     table_number: int = Field(...)
     is_reach_the_dinner: bool = Field(...)
+    gender: Literal["male", "female"]
+    contact_person: str
+    add_manual: bool
     is_active: bool = Field(default=True)
     date_created: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
