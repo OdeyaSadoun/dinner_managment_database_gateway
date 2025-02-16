@@ -14,7 +14,7 @@ class TableModel(BaseModel):
     chairs: int = Field(default=12)
     table_number: int
     gender: Literal["male", "female"]
-    shape: Literal["abir", "circle", "square"]
+    shape: Literal["rectangle", "circle", "square"]
     is_active: bool = Field(default=True)
     date_created: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
