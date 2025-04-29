@@ -91,6 +91,7 @@ class UserController:
     
     def get_all_users(self) -> Response:
         try:
+            print("ctrl db")
             users = list(self._handle_db_operation(self.collection.find))
             # הסרת הסיסמה מהרשומות
             for user in users:

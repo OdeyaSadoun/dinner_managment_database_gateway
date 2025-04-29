@@ -16,7 +16,7 @@ class Request:
             ZMQConstStrings.resource_identifier: self.resource,
             ZMQConstStrings.operation_identifier: self.operation,
             ZMQConstStrings.data_identifier: self.data
-        })
+        }, default=str)
     
     @classmethod
     def from_json(self, json_str: str):

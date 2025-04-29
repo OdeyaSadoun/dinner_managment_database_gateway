@@ -5,6 +5,7 @@ class DataConstStrings:
     phone_key = "phone"
     auth_key = "auth"
     user_key = "user"
+    users_key = "users"
     person_id_key = "person_id"
     person_key = "person"
     people_key = "people"
