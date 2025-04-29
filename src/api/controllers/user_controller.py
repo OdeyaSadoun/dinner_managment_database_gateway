@@ -92,7 +92,7 @@ class UserController:
     def get_all_users(self) -> Response:
         try:
             print("ctrl db")
-            users = list(self._handle_db_operation(self.collection.find))
+            users = list(self._handle_db_operation(self.collection.find, {DataConstStrings.is_active_key: True}))
             # הסרת הסיסמה מהרשומות
             for user in users:
                 user.pop(DataConstStrings.password_key, None)
@@ -149,6 +149,7 @@ class UserController:
     
     def delete_user(self, user_id: str) -> None:
         try:
+            print("delete user db", user_id)
             result = self._handle_db_operation(
                 self.collection.update_one,
                 {DataConstStrings.id_key: ObjectId(
@@ -156,7 +157,8 @@ class UserController:
                 {DatabaseConstStrings.set_operator: {
                     DataConstStrings.is_active_key: False}}
             )
-            if not result.modified_count:
+            print(result)
+            if not result.modified_count or user_id == None:
                 return Response(
                     status=ResponseStatus.ERROR,
                     data={
