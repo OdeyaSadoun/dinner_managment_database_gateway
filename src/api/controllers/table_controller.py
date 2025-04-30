@@ -58,18 +58,35 @@ class TableController:
                 data={ZMQConstStrings.error_message: str(e)}
             )
 
-    def create_table(self, table: TableModel) -> None:
+    def create_table(self, table: TableModel) -> Response:
         try:
             validated_table = TableModel(**table)
-            table_data_to_insert = validated_table.model_dump(
-                by_alias=True, exclude_none=True, exclude_unset=False)
-            result = self._handle_db_operation(
-                self.collection.insert_one, table_data_to_insert)
-            return Response(
-                status=ResponseStatus.SUCCESS,
-                data={DataConstStrings.inserted_id_key: str(
-                    result.inserted_id)}
+            table_data = validated_table.model_dump(
+                by_alias=True, exclude_none=True, exclude_unset=False
             )
+
+            existing_table = self.collection.find_one({
+                "table_number": table_data["table_number"],
+                DataConstStrings.is_active_key: True
+            })
+
+            if existing_table:
+                # אם קיים שולחן כזה - נעדכן אותו
+                result = self.collection.update_one(
+                    {"_id": existing_table["_id"]},
+                    {DatabaseConstStrings.set_operator: table_data}
+                )
+                return Response(
+                    status=ResponseStatus.SUCCESS,
+                    data={DataConstStrings.updated_id_key: str(existing_table["_id"])}
+                )
+            else:
+                # אחרת - ניצור חדש
+                result = self.collection.insert_one(table_data)
+                return Response(
+                    status=ResponseStatus.SUCCESS,
+                    data={DataConstStrings.inserted_id_key: str(result.inserted_id)}
+                )
         except Exception as e:
             return Response(
                 status=ResponseStatus.ERROR,
