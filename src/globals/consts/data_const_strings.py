@@ -23,4 +23,4 @@ class DataConstStrings:
     token_key = "token"
     exp_key = "exp"
     password_key = "password"
-    user_data_key = "user_data"
+    user_data_key = "user"

@@ -6,6 +6,7 @@ from typing import Any, Dict
 from pymongo.errors import DuplicateKeyError
 from bson import ObjectId
 
+from models.data_models.user_without_password_model import UserWithoutPasswordModel
 from models.data_classes.login_user import LoginUser
 from globals.consts.const_strings import ConstStrings
 from globals.consts.data_errors_messages_const_strings import DataErrorsMessagesConstStrings
@@ -173,10 +174,10 @@ class UserController:
                 data={ZMQConstStrings.error_message: str(e)}
             )
 
-    def update_user(self, user_id: str, user: UserModel) -> None:
+    def update_user(self, user_id: str, user: UserWithoutPasswordModel) -> None:
         try:
             print("user_id", user_id, user)
-            validated_user = UserModel(**user)
+            validated_user = UserWithoutPasswordModel(**user)
             print("validated_user", validated_user)
             user_data_to_update=validated_user.model_dump(
                 by_alias=True, exclude_none=True, exclude_unset=False)
