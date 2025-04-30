@@ -16,6 +16,7 @@ class DataErrorsMessagesConstStrings:
     person_id_not_found_exception = "Active person with the given ID not found."
     personal_number_not_found_exception = "Active person with personal number not found."
     update_person_exception = "Active person not found or no changes made."
+    update_user_exception = "Active user not found or no changes made."
     invalid_object_id_format_exception = "Invalid ObjectId format: "
     object_id_wrong_type_exception = "Value must be an ObjectId, got "
     

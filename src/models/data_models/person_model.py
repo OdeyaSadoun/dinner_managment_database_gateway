@@ -15,7 +15,7 @@ class PersonModel(BaseModel):
     table_number: int = Field(...)
     is_reach_the_dinner: bool = Field(...)
     gender: Literal["male", "female"]
-    contact_person: str
+    contact_person: Optional[str]
     add_manual: bool
     is_active: bool = Field(default=True)
     date_created: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

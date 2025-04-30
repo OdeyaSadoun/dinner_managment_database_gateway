@@ -173,24 +173,29 @@ class UserController:
                 data={ZMQConstStrings.error_message: str(e)}
             )
 
-    def update_user(self, user_id: str, updated_user_data: Dict) -> Response:
+    def update_user(self, user_id: str, user: UserModel) -> None:
         try:
-            if DataConstStrings.password_key in updated_user_data:
-                hashed_password = bcrypt.hashpw(updated_user_data[DataConstStrings.password_key].encode(ConstStrings.encode), bcrypt.gensalt())
-                updated_user_data[DataConstStrings.password_key] = hashed_password.decode(ConstStrings.encode)
-            result = self._handle_db_operation(
+            print("user_id", user_id, user)
+            validated_user = UserModel(**user)
+            print("validated_user", validated_user)
+            user_data_to_update=validated_user.model_dump(
+                by_alias=True, exclude_none=True, exclude_unset=False)
+            user_data_to_update.pop(DataConstStrings.id_key, None)
+            result=self._handle_db_operation(
                 self.collection.update_one,
-                {DataConstStrings.id_key: ObjectId(user_id)},
-                {DatabaseConstStrings.set_operator: updated_user_data}
+                {DataConstStrings.id_key: ObjectId(
+                    user_id), DataConstStrings.is_active_key: True},
+                {DatabaseConstStrings.set_operator: user_data_to_update}
             )
-            if result.matched_count == 0:
+            print("result", result)
+            if result.modified_count == 0:
                 return Response(
                     status=ResponseStatus.ERROR,
-                    data={ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.user_not_found}
+                    data={
+                        ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.update_user_exception}
                 )
             return Response(
-                status=ResponseStatus.SUCCESS,
-                data={DataConstStrings.id_key: user_id}
+                status=ResponseStatus.SUCCESS
             )
         except Exception as e:
             return Response(
