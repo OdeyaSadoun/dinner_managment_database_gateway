@@ -60,33 +60,32 @@ class TableController:
 
     def create_table(self, table: TableModel) -> Response:
         try:
+            print("create table db ctrl")
             validated_table = TableModel(**table)
             table_data = validated_table.model_dump(
                 by_alias=True, exclude_none=True, exclude_unset=False
             )
 
+            # בדיקה אם כבר קיים שולחן עם אותו מספר פעיל
             existing_table = self.collection.find_one({
                 "table_number": table_data["table_number"],
                 DataConstStrings.is_active_key: True
             })
-
+            print("existing_table",existing_table)
             if existing_table:
-                # אם קיים שולחן כזה - נעדכן אותו
-                result = self.collection.update_one(
-                    {"_id": existing_table["_id"]},
-                    {DatabaseConstStrings.set_operator: table_data}
-                )
+                # מחזיר שגיאה במקום לעדכן
                 return Response(
-                    status=ResponseStatus.SUCCESS,
-                    data={DataConstStrings.updated_id_key: str(existing_table["_id"])}
+                    status=ResponseStatus.ERROR,
+                    data={ZMQConstStrings.error_message: "מספר שולחן זה כבר קיים במערכת."}
                 )
-            else:
-                # אחרת - ניצור חדש
-                result = self.collection.insert_one(table_data)
-                return Response(
-                    status=ResponseStatus.SUCCESS,
-                    data={DataConstStrings.inserted_id_key: str(result.inserted_id)}
-                )
+            print("table not exist")
+            # הוספת שולחן חדש
+            result = self.collection.insert_one(table_data)
+            return Response(
+                status=ResponseStatus.SUCCESS,
+                data={DataConstStrings.inserted_id_key: str(result.inserted_id)}
+            )
+
         except Exception as e:
             return Response(
                 status=ResponseStatus.ERROR,

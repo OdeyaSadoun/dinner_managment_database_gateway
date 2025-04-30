@@ -21,6 +21,7 @@ class MongoDBDatabaseManager(IDatabaseManager):
             client = MongoClient(mongo_uri, serverSelectionTimeoutMS=Consts.server_selection_timeout_ms) 
             self._db = client[database_name]
             self.test_connection()
+            self.create_indexes()
         except ConnectionFailure as e:
             raise ConnectionFailure(f"{DataErrorsMessagesConstStrings.connection_exception} {e}")
 
@@ -29,7 +30,17 @@ class MongoDBDatabaseManager(IDatabaseManager):
             self._db.command(DatabaseConstStrings.ping)
         except ConnectionFailure as e:
             raise ConnectionFailure("{DataErrorsMessagesConstStrings.connection_exception} {e}")
-
+    
+    def create_indexes(self):
+        try:
+            self._db["tables"].create_index(
+                [("table_number", 1)],
+                unique=True,
+                partialFilterExpression={"is_active": True} 
+            )
+        except Exception as e:
+            print(f"⚠️ שגיאה בהגדרת אינדקסים: {e}")
+    
     @property
     def db(self):
         if self._db is None:
