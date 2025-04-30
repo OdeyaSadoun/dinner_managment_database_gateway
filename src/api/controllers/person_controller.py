@@ -71,7 +71,12 @@ class PersonController:
                 data={DataConstStrings.id_key: str(result.inserted_id),
                       "name": validated_person.name,
                       "phone": validated_person.phone,
-                      "table_number": validated_person.table_number}
+                      "table_number": validated_person.table_number,
+                      "add_manual": validated_person.add_manual,
+                      "gender": validated_person.gender,
+                      "contact_person": validated_person.contact_person,
+                      "is_reach_the_dinner": validated_person.is_reach_the_dinner
+                      }
             )
         except Exception as e:
             return Response(
