@@ -79,8 +79,31 @@ class TableController:
                         ZMQConstStrings.error_message: "שולחן עם מספר זה כבר קיים במערכת."
                     }
                 )
-
             print("table not exist")
+            existing_not_active_table = self.collection.find_one({
+                "table_number": table_data["table_number"],
+                DataConstStrings.is_active_key: False
+            })
+            print("existing_not_active_table", existing_not_active_table)
+            if existing_not_active_table:
+                table["is_active"] = True
+                result = self._handle_db_operation(
+                    self.collection.update_one,
+                    {DataConstStrings.id_key: 
+                        existing_not_active_table["_id"]},
+                    {DatabaseConstStrings.set_operator: table}
+                )
+                if result.modified_count == 0:
+                    return Response(
+                        status=ResponseStatus.ERROR,
+                        data={
+                            ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.update_table_exception}
+                    )
+                return Response(
+                status=ResponseStatus.SUCCESS,
+                data={DataConstStrings.inserted_id_key: str( existing_not_active_table["_id"])}
+            )
+            
             # הוספת שולחן חדש
             result = self.collection.insert_one(table_data)
             return Response(
