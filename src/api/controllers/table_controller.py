@@ -65,19 +65,21 @@ class TableController:
             table_data = validated_table.model_dump(
                 by_alias=True, exclude_none=True, exclude_unset=False
             )
-
+            print("table_data", table_data)
             # בדיקה אם כבר קיים שולחן עם אותו מספר פעיל
             existing_table = self.collection.find_one({
                 "table_number": table_data["table_number"],
                 DataConstStrings.is_active_key: True
             })
-            print("existing_table",existing_table)
+            print("existing_table", existing_table)
             if existing_table:
-                # מחזיר שגיאה במקום לעדכן
                 return Response(
                     status=ResponseStatus.ERROR,
-                    data={ZMQConstStrings.error_message: "מספר שולחן זה כבר קיים במערכת."}
+                    data={
+                        ZMQConstStrings.error_message: "שולחן עם מספר זה כבר קיים במערכת."
+                    }
                 )
+
             print("table not exist")
             # הוספת שולחן חדש
             result = self.collection.insert_one(table_data)

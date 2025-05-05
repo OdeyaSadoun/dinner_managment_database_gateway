@@ -11,6 +11,7 @@ class DataConstStrings:
     people_key = "people"
     inserted_id_key = "inserted_id"
     is_reach_the_dinner_key = "is_reach_the_dinner"
+    existing_id_key = "existing_id"
     
     table_key = "table"
     tables_key = "tables"
