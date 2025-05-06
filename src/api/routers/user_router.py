@@ -37,7 +37,7 @@ class UserRouter(BaseRouter):
     def get_user_by_id(self, data: Any) -> Response:
         user_id = data.get(DataConstStrings.user_id_key)
         return self._ctrl.get_user_by_id(user_id)
-
+    
     def get_user_by_username_and_password(self, data: Any) -> Response:
         username = data.get(DataConstStrings.username_key)
         password = data.get(DataConstStrings.password_key)

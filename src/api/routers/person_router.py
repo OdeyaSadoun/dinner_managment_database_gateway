@@ -14,6 +14,7 @@ class PersonRouter(BaseRouter):
     def _setup_operations(self) -> None:
         self._operations = {
             ZMQConstStrings.get_all_people: self.get_all_people,
+            ZMQConstStrings.get_manual_people: self.get_manual_people,
             ZMQConstStrings.get_person_by_id: self.get_person_by_id,
             ZMQConstStrings.create_person: self.create_person,
             ZMQConstStrings.update_person: self.update_person,
@@ -25,6 +26,9 @@ class PersonRouter(BaseRouter):
     def get_all_people(self, data: Any = None) -> Response:
         return self._ctrl.get_all_people()
 
+    def get_manual_people(self, data: Any) -> Response:
+        return self._ctrl.get_manual_people()
+    
     def get_person_by_id(self, data: Any) -> Response:
         person_id = data.get(DataConstStrings.person_id_key)
         return self._ctrl.get_person_by_id(person_id)

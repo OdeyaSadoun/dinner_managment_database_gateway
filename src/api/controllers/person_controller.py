@@ -42,6 +42,24 @@ class PersonController:
                 data={ZMQConstStrings.error_message: str(e)}
             )
 
+    def get_manual_people(self) -> Response:
+        try:
+            people = self._handle_db_operation(
+                self.collection.find, {
+                    DataConstStrings.is_active_key: True,
+                    DataConstStrings.add_manual_key: True
+                })
+            return Response(
+                status=ResponseStatus.SUCCESS,
+                data={DataConstStrings.people_key: SerializationUtil.serialize_mongo_object(
+                    list(people))}
+            )
+        except Exception as e:
+            return Response(
+                status=ResponseStatus.ERROR,
+                data={ZMQConstStrings.error_message: str(e)}
+            )
+
     def get_all_people(self) -> Response:
         try:
             people = self._handle_db_operation(
@@ -87,10 +105,10 @@ class PersonController:
     def update_person(self, person_id: str, person: PersonModel) -> None:
         try:
             validated_person = PersonModel(**person)
-            person_data_to_update=validated_person.dict(
+            person_data_to_update = validated_person.dict(
                 by_alias=True, exclude_none=True, exclude_unset=False)
             person_data_to_update.pop(DataConstStrings.id_key, None)
-            result=self._handle_db_operation(
+            result = self._handle_db_operation(
                 self.collection.update_one,
                 {DataConstStrings.id_key: ObjectId(
                     person_id), DataConstStrings.is_active_key: True},
@@ -113,7 +131,7 @@ class PersonController:
 
     def seat_person(self, person_id: str) -> None:
         try:
-            result=self._handle_db_operation(
+            result = self._handle_db_operation(
                 self.collection.update_one,
                 {DataConstStrings.id_key: ObjectId(
                     person_id), DataConstStrings.is_active_key: True},
@@ -137,7 +155,7 @@ class PersonController:
 
     def unseat_person(self, person_id: str) -> None:
         try:
-            result=self._handle_db_operation(
+            result = self._handle_db_operation(
                 self.collection.update_one,
                 {DataConstStrings.id_key: ObjectId(
                     person_id), DataConstStrings.is_active_key: True},
@@ -161,7 +179,7 @@ class PersonController:
 
     def delete_person(self, person_id: str) -> None:
         try:
-            result=self._handle_db_operation(
+            result = self._handle_db_operation(
                 self.collection.update_one,
                 {DataConstStrings.id_key: ObjectId(
                     person_id), DataConstStrings.is_active_key: True},

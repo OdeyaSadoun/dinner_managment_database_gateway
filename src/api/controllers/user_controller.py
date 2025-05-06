@@ -1,3 +1,4 @@
+from infrastructures.utils.serialization_util import SerializationUtil
 from models.data_models.user_model import UserModel
 from models.data_classes.zmq_response import Response
 from infrastructures.interfaces.idatabase_manager import IDatabaseManager

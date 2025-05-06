@@ -21,6 +21,7 @@ class ZMQConstStrings:
 
     # ? Person operations
     get_all_people = "get_all_people"
+    get_manual_people = "get_manual_people"
     get_person_by_id = "get_person_by_id"
     create_person = "create_person"
     update_person = "update_person"
