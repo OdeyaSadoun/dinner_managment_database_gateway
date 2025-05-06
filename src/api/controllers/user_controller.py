@@ -1,25 +1,24 @@
+from models.data_models.user_model import UserModel
+from models.data_classes.zmq_response import Response
+from infrastructures.interfaces.idatabase_manager import IDatabaseManager
+from globals.consts.database_const_strings import DatabaseConstStrings
+from globals.enums.response_status import ResponseStatus
+from globals.consts.zmq_const_strings import ZMQConstStrings
+from globals.consts.data_const_strings import DataConstStrings
+from globals.consts.data_errors_messages_const_strings import DataErrorsMessagesConstStrings
+from globals.consts.const_strings import ConstStrings
+from models.data_classes.login_user import LoginUser
+from models.data_models.user_without_password_model import UserWithoutPasswordModel
+from bson import ObjectId
+from pymongo.errors import DuplicateKeyError
+from typing import Any, Dict
+import datetime
+import bcrypt
+import jwt
 from dotenv import load_dotenv
 import os
 
-load_dotenv()  
-import jwt
-import bcrypt
-import datetime
-from typing import Any, Dict
-from pymongo.errors import DuplicateKeyError
-from bson import ObjectId
-
-from models.data_models.user_without_password_model import UserWithoutPasswordModel
-from models.data_classes.login_user import LoginUser
-from globals.consts.const_strings import ConstStrings
-from globals.consts.data_errors_messages_const_strings import DataErrorsMessagesConstStrings
-from globals.consts.data_const_strings import DataConstStrings
-from globals.consts.zmq_const_strings import ZMQConstStrings
-from globals.enums.response_status import ResponseStatus
-from globals.consts.database_const_strings import DatabaseConstStrings
-from infrastructures.interfaces.idatabase_manager import IDatabaseManager
-from models.data_classes.zmq_response import Response
-from models.data_models.user_model import UserModel
+load_dotenv()
 
 
 class UserController:
@@ -64,7 +63,8 @@ class UserController:
         try:
             user = self._handle_db_operation(
                 self.collection.find_one,
-                {DataConstStrings.username_key: login_data.get(DataConstStrings.username_key)}
+                {DataConstStrings.username_key: login_data.get(
+                    DataConstStrings.username_key)}
             )
             if not user:
                 return Response(
@@ -92,15 +92,17 @@ class UserController:
                 status=ResponseStatus.ERROR,
                 data={ZMQConstStrings.error_message: str(e)}
             )
-    
+
     def get_all_users(self) -> Response:
         try:
             print("ctrl db")
-            users = list(self._handle_db_operation(self.collection.find, {DataConstStrings.is_active_key: True}))
+            users = list(self._handle_db_operation(
+                self.collection.find, {DataConstStrings.is_active_key: True}))
             # הסרת הסיסמה מהרשומות
             for user in users:
                 user.pop(DataConstStrings.password_key, None)
-                user[DataConstStrings.id_key] = str(user[DataConstStrings.id_key])
+                user[DataConstStrings.id_key] = str(
+                    user[DataConstStrings.id_key])
             return Response(
                 status=ResponseStatus.SUCCESS,
                 data={DataConstStrings.users_key: users}
@@ -113,11 +115,16 @@ class UserController:
 
     def get_user_by_id(self, user_id: str) -> Response:
         try:
-            user = self._handle_db_operation(self.collection.find_one, {DataConstStrings.id_key: ObjectId(user_id)})
+            user = self._handle_db_operation(self.collection.find_one,
+                                             {
+                                                 DataConstStrings.id_key: ObjectId(user_id),
+                                                 DataConstStrings.is_active_key: True
+                                             })
             if not user:
                 return Response(
                     status=ResponseStatus.ERROR,
-                    data={ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.user_not_found}
+                    data={
+                        ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.user_not_found}
                 )
             user.pop(DataConstStrings.password_key, None)
             user[DataConstStrings.id_key] = str(user[DataConstStrings.id_key])
@@ -133,11 +140,13 @@ class UserController:
 
     def get_user_by_username_and_password(self, username: str, password: str) -> Response:
         try:
-            user = self._handle_db_operation(self.collection.find_one, {DataConstStrings.username_key: username})
+            user = self._handle_db_operation(self.collection.find_one, {
+                                             DataConstStrings.username_key: username})
             if not user or not bcrypt.checkpw(password.encode(ConstStrings.encode), user[DataConstStrings.password_key].encode(ConstStrings.encode)):
                 return Response(
                     status=ResponseStatus.ERROR,
-                    data={ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.incorrect_username_or_password}
+                    data={
+                        ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.incorrect_username_or_password}
                 )
             user.pop(DataConstStrings.password_key, None)
             user[DataConstStrings.id_key] = str(user[DataConstStrings.id_key])
@@ -150,7 +159,7 @@ class UserController:
                 status=ResponseStatus.ERROR,
                 data={ZMQConstStrings.error_message: str(e)}
             )
-    
+
     def delete_user(self, user_id: str) -> None:
         try:
             print("delete user db", user_id)
@@ -182,10 +191,10 @@ class UserController:
             print("user_id", user_id, user)
             validated_user = UserWithoutPasswordModel(**user)
             print("validated_user", validated_user)
-            user_data_to_update=validated_user.dict(
+            user_data_to_update = validated_user.dict(
                 by_alias=True, exclude_none=True, exclude_unset=False)
             user_data_to_update.pop(DataConstStrings.id_key, None)
-            result=self._handle_db_operation(
+            result = self._handle_db_operation(
                 self.collection.update_one,
                 {DataConstStrings.id_key: ObjectId(
                     user_id), DataConstStrings.is_active_key: True},
@@ -219,7 +228,8 @@ class UserController:
 
     def _create_jwt_token(self, user: Dict) -> str:
         try:
-            exp_delta_seconds = int(os.getenv(ConstStrings.jwt_exp_delta_seconds_env_key))
+            exp_delta_seconds = int(
+                os.getenv(ConstStrings.jwt_exp_delta_seconds_env_key))
         except (TypeError, ValueError):
             raise ValueError("Invalid value for JWT expiration delta seconds")
         payload = {
