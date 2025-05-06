@@ -1,6 +1,6 @@
 from bson import ObjectId
 from datetime import datetime, timezone
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, validator
 from typing import Literal, Optional, Tuple
 
 from api.validators.person_validators import PersonValidators 
@@ -20,7 +20,7 @@ class PersonModel(BaseModel):
     is_active: bool = Field(default=True)
     date_created: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    @field_validator(DataConstStrings.phone_key)
+    @validator(DataConstStrings.phone_key)
     def validate_phone(cls, value):
         return PersonValidators.validate_phone(value)
 

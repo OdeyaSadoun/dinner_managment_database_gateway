@@ -3,7 +3,7 @@ class DatabaseConstStrings:
 
     # ? Mongo connection
     mongo_uri = "MONGO_URI"
-    connection_string = "mongodb://localhost:27017"
+    connection_string = "mongodb://127.0.0.1:27017"
     database_name = "DATABASE_NAME"
     default_database_name = "default_db"
 

@@ -1,7 +1,9 @@
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
+from dotenv import load_dotenv
 import os
 
+load_dotenv()  
 from globals.consts.consts import Consts
 from globals.consts.database_const_strings import DatabaseConstStrings
 from globals.consts.data_errors_messages_const_strings import DataErrorsMessagesConstStrings

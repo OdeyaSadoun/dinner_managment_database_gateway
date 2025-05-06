@@ -62,7 +62,7 @@ class TableController:
         try:
             print("create table db ctrl")
             validated_table = TableModel(**table)
-            table_data = validated_table.model_dump(
+            table_data = validated_table.dict(
                 by_alias=True, exclude_none=True, exclude_unset=False
             )
             print("table_data", table_data)
@@ -159,7 +159,7 @@ class TableController:
     def update_table(self, table_id: str, table: TableModel) -> None:
         try:
             validated_table = TableModel(**table)
-            table_data_to_update = validated_table.model_dump(
+            table_data_to_update = validated_table.dict(
                 by_alias=True, exclude_none=True, exclude_unset=False)
             table_data_to_update.pop(DataConstStrings.id_key, None)
             result = self._handle_db_operation(

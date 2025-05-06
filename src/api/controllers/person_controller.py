@@ -62,7 +62,7 @@ class PersonController:
             print("person", person)
             validated_person = PersonModel(**person)
             print("validated_person", validated_person)
-            person_data_to_insert = validated_person.model_dump(
+            person_data_to_insert = validated_person.dict(
                 by_alias=True, exclude_none=True, exclude_unset=False)
             result = self._handle_db_operation(
                 self.collection.insert_one, person_data_to_insert)
@@ -87,7 +87,7 @@ class PersonController:
     def update_person(self, person_id: str, person: PersonModel) -> None:
         try:
             validated_person = PersonModel(**person)
-            person_data_to_update=validated_person.model_dump(
+            person_data_to_update=validated_person.dict(
                 by_alias=True, exclude_none=True, exclude_unset=False)
             person_data_to_update.pop(DataConstStrings.id_key, None)
             result=self._handle_db_operation(

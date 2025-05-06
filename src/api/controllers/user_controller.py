@@ -1,4 +1,7 @@
+from dotenv import load_dotenv
 import os
+
+load_dotenv()  
 import jwt
 import bcrypt
 import datetime
@@ -40,7 +43,7 @@ class UserController:
                 ConstStrings.encode), bcrypt.gensalt())
             validated_user.password = hashed_password.decode(
                 ConstStrings.encode)
-            user_data_to_insert = validated_user.model_dump(
+            user_data_to_insert = validated_user.dict(
                 by_alias=True, exclude_none=True, exclude_unset=False)
             result = self._handle_db_operation(
                 self.collection.insert_one, user_data_to_insert)
@@ -179,7 +182,7 @@ class UserController:
             print("user_id", user_id, user)
             validated_user = UserWithoutPasswordModel(**user)
             print("validated_user", validated_user)
-            user_data_to_update=validated_user.model_dump(
+            user_data_to_update=validated_user.dict(
                 by_alias=True, exclude_none=True, exclude_unset=False)
             user_data_to_update.pop(DataConstStrings.id_key, None)
             result=self._handle_db_operation(

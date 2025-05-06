@@ -1,4 +1,7 @@
+from dotenv import load_dotenv
 import os
+
+load_dotenv()  
 from api.controllers.user_controller import UserController
 from api.controllers.table_controller import TableController
 from api.controllers.person_controller import PersonController

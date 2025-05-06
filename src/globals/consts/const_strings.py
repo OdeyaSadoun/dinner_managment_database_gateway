@@ -12,4 +12,4 @@ class ConstStrings:
     jwt_algorithm_env_key = "JWT_ALGORITHM"
     jwt_exp_delta_seconds_env_key = "JWT_EXP_DELTA_SECONDS"
     localhost_env_key = "LOCAL_HOST"
-    port_env_key = "PORT"
+    port_env_key = "DATABASE_GATEWAY_PORT"
