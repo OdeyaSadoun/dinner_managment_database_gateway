@@ -42,6 +42,15 @@ class PersonController:
                 data={ZMQConstStrings.error_message: str(e)}
             )
 
+    def import_people_from_csv(self, people: list[dict]) -> Response:
+        try:
+            if not people:
+                return Response(status=ResponseStatus.ERROR, data={ZMQConstStrings.error_message: "רשימה ריקה"})
+            result = self.collection.insert_many(people)
+            return Response(status=ResponseStatus.SUCCESS, data={"inserted_count": len(result.inserted_ids)})
+        except Exception as e:
+            return Response(status=ResponseStatus.ERROR, data={ZMQConstStrings.error_message: str(e)})
+
     def get_manual_people(self) -> Response:
         try:
             people = self._handle_db_operation(

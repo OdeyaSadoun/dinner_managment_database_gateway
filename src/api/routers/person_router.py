@@ -21,7 +21,12 @@ class PersonRouter(BaseRouter):
             ZMQConstStrings.seat_person: self.seat_person,
             ZMQConstStrings.unseat_person: self.unseat_person,
             ZMQConstStrings.delete_person: self.delete_person,
+            ZMQConstStrings.import_people_from_csv: self.import_people_from_csv
         }
+
+    def import_people_from_csv(self, data: Any) -> Response:
+        people = data.get(DataConstStrings.people_key)
+        return self._ctrl.import_people_from_csv(people)
 
     def get_all_people(self, data: Any = None) -> Response:
         return self._ctrl.get_all_people()
