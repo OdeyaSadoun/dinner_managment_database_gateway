@@ -11,7 +11,7 @@ from globals.consts.data_const_strings import DataConstStrings
 class PersonModel(BaseModel):
     id: Optional[ObjectId] = Field(default_factory=ObjectId, alias=ConstStrings.id_before_serialization) 
     name: str = Field(...)
-    phone: str = Field(...)
+    phone: Optional[str]
     table_number: int = Field(...)
     is_reach_the_dinner: bool = Field(...)
     gender: Literal["male", "female"]
