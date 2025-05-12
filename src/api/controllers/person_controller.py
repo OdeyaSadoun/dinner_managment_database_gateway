@@ -42,14 +42,47 @@ class PersonController:
                 data={ZMQConstStrings.error_message: str(e)}
             )
 
-    def import_people_from_csv(self, people: list[dict]) -> Response:
+    def import_people_from_csv(self, people: list[PersonModel]) -> Response:
         try:
+            print("people", people)
             if not people:
-                return Response(status=ResponseStatus.ERROR, data={ZMQConstStrings.error_message: "רשימה ריקה"})
-            result = self.collection.insert_many(people)
-            return Response(status=ResponseStatus.SUCCESS, data={"inserted_count": len(result.inserted_ids)})
+                return Response(
+                    status=ResponseStatus.ERROR,
+                    data={ZMQConstStrings.error_message: "רשימה ריקה"}
+                )
+
+            inserted_people = []
+            for person in people:
+                validated_person = PersonModel(**person)
+                person_data_to_insert = validated_person.dict(
+                    by_alias=True, exclude_unset=False, exclude_none=False
+                )
+
+                result = self._handle_db_operation(
+                    self.collection.insert_one, person_data_to_insert
+                )
+
+                inserted_people.append({
+                    "id": str(result.inserted_id),
+                    "name": validated_person.name,
+                    "phone": validated_person.phone,
+                    "table_number": validated_person.table_number,
+                    "add_manual": validated_person.add_manual,
+                    "gender": validated_person.gender,
+                    "contact_person": validated_person.contact_person,
+                    "is_reach_the_dinner": validated_person.is_reach_the_dinner
+                })
+
+            return Response(
+                status=ResponseStatus.SUCCESS,
+                data={"people": inserted_people}
+            )
+
         except Exception as e:
-            return Response(status=ResponseStatus.ERROR, data={ZMQConstStrings.error_message: str(e)})
+            return Response(
+                status=ResponseStatus.ERROR,
+                data={ZMQConstStrings.error_message: str(e)}
+            )
 
     def get_manual_people(self) -> Response:
         try:
@@ -87,6 +120,7 @@ class PersonController:
     def create_person(self, person: PersonModel) -> None:
         try:
             print("person", person)
+            print("TYPE OF person:", type(person))
             validated_person = PersonModel(**person)
             print("validated_person", validated_person)
             person_data_to_insert = validated_person.dict(
