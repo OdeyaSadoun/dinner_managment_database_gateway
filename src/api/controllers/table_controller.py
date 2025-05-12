@@ -20,6 +20,44 @@ class TableController:
         self.collection = database_manager.db[DatabaseConstStrings.tables_collection]
         # self._ensure_indexes_creation()
 
+    def import_tables_from_csv(self, tables: list) -> Response:
+        try:
+            if not tables:
+                return Response(
+                    status=ResponseStatus.ERROR,
+                    data={ZMQConstStrings.error_message: "הרשימה ריקה"}
+                )
+
+            inserted_tables = []
+            for table in tables:
+                validated_table = TableModel(**table)
+                table_data_to_insert = validated_table.dict(
+                    by_alias=True, exclude_unset=False, exclude_none=False
+                )
+
+                result = self._handle_db_operation(
+                    self.collection.insert_one, table_data_to_insert
+                )
+
+                inserted_tables.append({
+                    "id": str(result.inserted_id),
+                    "table_number": validated_table.table_number,
+                    "chairs": validated_table.chairs,
+                    "shape": validated_table.shape,
+                    "gender": validated_table.gender,
+                })
+
+            return Response(
+                status=ResponseStatus.SUCCESS,
+                data={"tables": inserted_tables}
+            )
+
+        except Exception as e:
+            return Response(
+                status=ResponseStatus.ERROR,
+                data={ZMQConstStrings.error_message: str(e)}
+            )
+
     def get_table_by_id(self, table_id: str) -> Response:
         try:
             table = self._handle_db_operation(self.collection.find_one, {

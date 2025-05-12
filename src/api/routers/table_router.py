@@ -22,7 +22,12 @@ class TableRouter(BaseRouter):
             ZMQConstStrings.delete_table: self.delete_table,
             ZMQConstStrings.add_person_to_table: self.add_person_to_table,
             ZMQConstStrings.remove_person_from_table: self.remove_person_from_table,
+            ZMQConstStrings.import_tables_from_csv: self.import_tables_from_csv,
         }
+        
+    def import_tables_from_csv(self, data: Any) -> Response:
+        tables = data.get(DataConstStrings.tables_key)
+        return self._ctrl.import_tables_from_csv(tables)
 
     def get_all_tables(self, data: Any = None) -> Response:
         return self._ctrl.get_all_tables()

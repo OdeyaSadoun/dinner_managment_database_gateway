@@ -39,6 +39,7 @@ class ZMQConstStrings:
     delete_table = "delete_table"
     add_person_to_table = "add_person_to_table"
     remove_person_from_table = "remove_person_from_table"
+    import_tables_from_csv = "import_tables_from_csv"
     
     # ? Authorozation operations
     register = "register"
