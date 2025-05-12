@@ -13,6 +13,7 @@ class TableModel(BaseModel):
     position: Dict[str, int] = Field(default_factory=lambda: {"x": 0, "y": 0})  
     chairs: int = Field(default=12)
     table_number: int
+    rotation: Optional[int] = 0
     gender: Literal["male", "female"]
     shape: Literal["rectangle", "circle", "square", "vip", "reserva", "bima"]
     is_active: bool = Field(default=True)
