@@ -224,24 +224,42 @@ class TableController:
                 data={ZMQConstStrings.error_message: str(e)}
             )
 
-    def delete_table(self, table_id: str) -> None:
+    def delete_table(self, table_id: str) -> Response:
         try:
-            result = self._handle_db_operation(
-                self.collection.update_one,
-                {DataConstStrings.id_key: ObjectId(
-                    table_id), DataConstStrings.is_active_key: True},
-                {DatabaseConstStrings.set_operator: {
-                    DataConstStrings.is_active_key: False}}
+            # שליפת השולחן
+            table = self._handle_db_operation(
+                self.collection.find_one,
+                {DataConstStrings.id_key: ObjectId(table_id), DataConstStrings.is_active_key: True}
             )
-            if not result.modified_count:
+
+            if not table:
                 return Response(
                     status=ResponseStatus.ERROR,
-                    data={
-                        ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.table_id_not_found_exception}
+                    data={ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.table_id_not_found_exception}
                 )
-            return Response(
-                status=ResponseStatus.SUCCESS
+
+            # 🟡 בדיקה אם יש אנשים ברשימת האנשים
+            if table.get("people_list") and len(table["people_list"]) > 0:
+                return Response(
+                    status=ResponseStatus.ERROR,
+                    data={"error_message": "לא ניתן למחוק שולחן עם אנשים משובצים."}
+                )
+
+            # 🗑️ מחיקה לוגית
+            result = self._handle_db_operation(
+                self.collection.update_one,
+                {DataConstStrings.id_key: ObjectId(table_id)},
+                {DatabaseConstStrings.set_operator: {DataConstStrings.is_active_key: False}}
             )
+
+            if result.modified_count == 0:
+                return Response(
+                    status=ResponseStatus.ERROR,
+                    data={ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.table_id_not_found_exception}
+                )
+
+            return Response(status=ResponseStatus.SUCCESS)
+
         except Exception as e:
             return Response(
                 status=ResponseStatus.ERROR,
