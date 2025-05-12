@@ -27,7 +27,7 @@ class TableController:
                     status=ResponseStatus.ERROR,
                     data={ZMQConstStrings.error_message: "הרשימה ריקה"}
                 )
-
+            print("tables", len(tables))
             inserted_tables = []
             for table in tables:
                 validated_table = TableModel(**table)
@@ -45,7 +45,10 @@ class TableController:
                     "chairs": validated_table.chairs,
                     "shape": validated_table.shape,
                     "gender": validated_table.gender,
+                    "position": validated_table.position,
+                    "people_list": validated_table.people_list,
                 })
+            print("inserted_tables", len(inserted_tables))
 
             return Response(
                 status=ResponseStatus.SUCCESS,
