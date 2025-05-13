@@ -10,7 +10,7 @@ class DataErrorsMessagesConstStrings:
     table_duplicate_key_exception = "A table with this id already exists."
     table_id_not_found_exception = "Active table with the given ID not found."
     update_table_exception = "Active table not found or no changes made."
-
+    table_number_not_found_exception = "table number not found"
     # ? person exception
     person_duplicate_key_exception = "A person with this id already exists."
     person_id_not_found_exception = "Active person with the given ID not found."

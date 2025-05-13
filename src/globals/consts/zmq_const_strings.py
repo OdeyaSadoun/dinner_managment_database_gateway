@@ -40,7 +40,8 @@ class ZMQConstStrings:
     add_person_to_table = "add_person_to_table"
     remove_person_from_table = "remove_person_from_table"
     import_tables_from_csv = "import_tables_from_csv"
-    
+    sync_tables_people_operation = "sync_tables_people_operation"
+    get_table_by_number_operation = "get_table_by_number"
     # ? Authorozation operations
     register = "register"
     login = "login"

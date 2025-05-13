@@ -23,8 +23,13 @@ class TableRouter(BaseRouter):
             ZMQConstStrings.add_person_to_table: self.add_person_to_table,
             ZMQConstStrings.remove_person_from_table: self.remove_person_from_table,
             ZMQConstStrings.import_tables_from_csv: self.import_tables_from_csv,
+            ZMQConstStrings.sync_tables_people_operation: self.sync_tables_people,  
+            ZMQConstStrings.get_table_by_number_operation: self.get_table_by_number
         }
-        
+    
+    def sync_tables_people(self, data: Any = None) -> Response:
+        return self._ctrl.sync_tables_people()
+    
     def import_tables_from_csv(self, data: Any) -> Response:
         tables = data.get(DataConstStrings.tables_key)
         return self._ctrl.import_tables_from_csv(tables)
@@ -35,6 +40,11 @@ class TableRouter(BaseRouter):
     def get_table_by_id(self, data: Any) -> Response:
         table_id = data.get(DataConstStrings.table_id_key)
         return self._ctrl.get_table_by_id(table_id)
+    
+    def get_table_by_number(self, data: Any) -> Response:
+        print("data", data)
+        table_number = data.get(DataConstStrings.table_number_key)
+        return self._ctrl.get_table_by_number(table_number)
 
     def create_table(self, data: Any) -> Response:
         table = data.get(DataConstStrings.table_key)

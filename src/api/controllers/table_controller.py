@@ -67,6 +67,7 @@ class TableController:
                 DataConstStrings.id_key: ObjectId(table_id),
                 DataConstStrings.is_active_key: True
             })
+            print("table", table)
             if not table:
                 return Response(
                     status=ResponseStatus.ERROR,
@@ -77,6 +78,34 @@ class TableController:
                 status=ResponseStatus.SUCCESS,
                 data={
                     DataConstStrings.table_key: SerializationUtil.serialize_mongo_object(table)}
+            )
+        except Exception as e:
+            return Response(
+                status=ResponseStatus.ERROR,
+                data={ZMQConstStrings.error_message: str(e)}
+            )
+    
+    def get_table_by_number(self, table_number: int) -> Response:
+        try:
+            print("table_number", table_number)
+            table = self._handle_db_operation(self.collection.find_one, {
+                DataConstStrings.table_number_key: table_number,
+                DataConstStrings.is_active_key: True
+            })
+            print("table", table)
+            if not table:
+                return Response(
+                    status=ResponseStatus.ERROR,
+                    data={
+                        ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.table_number_not_found_exception
+                    }
+                )
+            print("table", table)
+            return Response(
+                status=ResponseStatus.SUCCESS,
+                data={
+                    DataConstStrings.table_id_key: str(table["_id"])
+                }
             )
         except Exception as e:
             return Response(
@@ -218,6 +247,64 @@ class TableController:
             return Response(
                 status=ResponseStatus.SUCCESS
             )
+        except Exception as e:
+            return Response(
+                status=ResponseStatus.ERROR,
+                data={ZMQConstStrings.error_message: str(e)}
+            )
+
+    def sync_tables_people(self) -> Response:
+        try:
+            db = self.collection.database
+            people_collection = db[DatabaseConstStrings.people_collection]
+            tables_collection = self.collection
+
+            # שליפת כל האנשים הפעילים עם מספר שולחן
+            people_cursor = self._handle_db_operation(
+                people_collection.find,
+                {
+                    DataConstStrings.is_active_key: True,
+                    DataConstStrings.table_number_key: {"$ne": None}
+                }
+            )
+
+            # יצירת מיפוי table_number -> [ObjectId של האנשים]
+            table_to_people = {}
+            for person in people_cursor:
+                table_number = person.get("table_number")
+                if table_number is not None:
+                    table_to_people.setdefault(table_number, []).append(person["_id"])
+
+            # שליפת כל השולחנות הפעילים
+            tables_cursor = self._handle_db_operation(
+                tables_collection.find,
+                {
+                    DataConstStrings.is_active_key: True
+                }
+            )
+
+            # עדכון כל שולחן – גם אם אין לו אנשים בכלל
+            updated = 0
+            for table in tables_cursor:
+                table_number = table["table_number"]
+                people_ids = table_to_people.get(table_number, [])  # רשימה ריקה אם אין
+
+                result = self._handle_db_operation(
+                    tables_collection.update_one,
+                    {
+                        "_id": table["_id"]
+                    },
+                    {
+                        "$set": {"people_list": people_ids}
+                    }
+                )
+                updated += result.modified_count
+
+            return Response(
+                status=ResponseStatus.SUCCESS,
+                data={"updated_tables": updated}
+            )
+
         except Exception as e:
             return Response(
                 status=ResponseStatus.ERROR,

@@ -18,6 +18,7 @@ class PersonController:
     def __init__(self, database_manager: IDatabaseManager) -> None:
         self.collection = database_manager.db[DatabaseConstStrings.people_collection]
         # self._ensure_indexes_creation()
+        self.database_manager = database_manager
 
     def get_person_by_id(self, person_id: str) -> Response:
         try:
@@ -220,24 +221,58 @@ class PersonController:
                 data={ZMQConstStrings.error_message: str(e)}
             )
 
-    def delete_person(self, person_id: str) -> None:
+    def delete_person(self, person_id: str) -> Response:
         try:
-            result = self._handle_db_operation(
-                self.collection.update_one,
-                {DataConstStrings.id_key: ObjectId(
-                    person_id), DataConstStrings.is_active_key: True},
-                {DatabaseConstStrings.set_operator: {
-                    DataConstStrings.is_active_key: False}}
-            )
-            if not result.modified_count:
+            # שלב 1: מצא את האדם
+            person = self._handle_db_operation(self.collection.find_one, {
+                DataConstStrings.id_key: ObjectId(person_id),
+                DataConstStrings.is_active_key: True
+            })
+            if not person:
                 return Response(
                     status=ResponseStatus.ERROR,
                     data={
                         ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.person_id_not_found_exception}
                 )
-            return Response(
-                status=ResponseStatus.SUCCESS
+
+            # שלב 2: הסרה מהשולחן אם יש table_number
+            # if "table_number" in person and person["table_number"] is not None:
+            #     self._handle_db_operation(
+            #         self.database_manager.db[DatabaseConstStrings.tables_collection].update_many,
+            #         {
+            #             DataConstStrings.table_number_key: person["table_number"],
+            #             DataConstStrings.is_active_key: True
+            #         },
+            #         {
+            #             "$pull": {
+            #                 "people_list": {
+            #                     "id": str(person_id)
+            #                 }
+            #             }
+            #         }
+            #     )
+
+            # שלב 3: סימון is_active = False
+            result = self._handle_db_operation(
+                self.collection.update_one,
+                {
+                    DataConstStrings.id_key: ObjectId(person_id)
+                },
+                {
+                    "$set": {
+                        DataConstStrings.is_active_key: False
+                    }
+                }
             )
+
+            if not result.modified_count:
+                return Response(
+                    status=ResponseStatus.ERROR,
+                    data={ZMQConstStrings.error_message: "המשתתף לא עודכן"}
+                )
+
+            return Response(status=ResponseStatus.SUCCESS)
+
         except Exception as e:
             return Response(
                 status=ResponseStatus.ERROR,

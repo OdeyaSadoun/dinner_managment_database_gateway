@@ -18,6 +18,7 @@ class DataConstStrings:
     tables_key = "tables"
     table_id_key = "table_id"
     position_key = "position"
+    table_number_key = "table_number"
     
     user_id_key = "user_id"
     username_key = "username"
