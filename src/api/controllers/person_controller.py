@@ -148,6 +148,7 @@ class PersonController:
 
     def update_person(self, person_id: str, person: PersonModel) -> None:
         try:
+            print("person", person)
             validated_person = PersonModel(**person)
             person_data_to_update = validated_person.dict(
                 by_alias=True, exclude_none=True, exclude_unset=False)
