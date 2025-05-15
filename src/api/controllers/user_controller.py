@@ -65,7 +65,9 @@ class UserController:
             user = self._handle_db_operation(
                 self.collection.find_one,
                 {DataConstStrings.username_key: login_data.get(
-                    DataConstStrings.username_key)}
+                    DataConstStrings.username_key),
+                    DataConstStrings.is_active_key: True
+                 }
             )
             if not user:
                 return Response(
