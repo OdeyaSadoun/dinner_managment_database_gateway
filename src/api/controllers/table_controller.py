@@ -226,84 +226,46 @@ class TableController:
             )
         return Response(status=ResponseStatus.SUCCESS)
 
-    def update_table(self, table_id: str, table: TableModel) -> None:
+    def update_table(self, table_id: str, table: TableModel) -> Response:
         try:
+            # 🟡 שליפת השולחן הקיים
+            existing_table = self._handle_db_operation(
+                self.collection.find_one,
+                {DataConstStrings.id_key: ObjectId(table_id), DataConstStrings.is_active_key: True}
+            )
+
+            if not existing_table:
+                return Response(
+                    status=ResponseStatus.ERROR,
+                    data={ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.table_id_not_found_exception}
+                )
+            print("existing_table",existing_table.get("people_list"))
+            # ❌ מניעת עריכה אם יש אנשים משובצים
+            if existing_table.get("people_list") and len(existing_table.get("people_list")) > 0:
+                return Response(
+                    status=ResponseStatus.ERROR,
+                    data={"error_message": "לא ניתן לערוך שולחן עם אנשים משובצים."}
+                )
+
+            # ✔️ המשך עריכה כרגיל
             validated_table = TableModel(**table)
             table_data_to_update = validated_table.dict(
                 by_alias=True, exclude_none=True, exclude_unset=False)
             table_data_to_update.pop(DataConstStrings.id_key, None)
+
             result = self._handle_db_operation(
                 self.collection.update_one,
-                {DataConstStrings.id_key: ObjectId(
-                    table_id), DataConstStrings.is_active_key: True},
+                {DataConstStrings.id_key: ObjectId(table_id), DataConstStrings.is_active_key: True},
                 {DatabaseConstStrings.set_operator: table_data_to_update}
             )
+
             if result.modified_count == 0:
                 return Response(
                     status=ResponseStatus.ERROR,
-                    data={
-                        ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.update_table_exception}
+                    data={ZMQConstStrings.error_message: DataErrorsMessagesConstStrings.update_table_exception}
                 )
-            return Response(
-                status=ResponseStatus.SUCCESS
-            )
-        except Exception as e:
-            return Response(
-                status=ResponseStatus.ERROR,
-                data={ZMQConstStrings.error_message: str(e)}
-            )
 
-    def sync_tables_people(self) -> Response:
-        try:
-            db = self.collection.database
-            people_collection = db[DatabaseConstStrings.people_collection]
-            tables_collection = self.collection
-
-            # שליפת כל האנשים הפעילים עם מספר שולחן
-            people_cursor = self._handle_db_operation(
-                people_collection.find,
-                {
-                    DataConstStrings.is_active_key: True,
-                    DataConstStrings.table_number_key: {"$ne": None}
-                }
-            )
-
-            # יצירת מיפוי table_number -> [ObjectId של האנשים]
-            table_to_people = {}
-            for person in people_cursor:
-                table_number = person.get("table_number")
-                if table_number is not None:
-                    table_to_people.setdefault(table_number, []).append(person["_id"])
-
-            # שליפת כל השולחנות הפעילים
-            tables_cursor = self._handle_db_operation(
-                tables_collection.find,
-                {
-                    DataConstStrings.is_active_key: True
-                }
-            )
-
-            # עדכון כל שולחן – גם אם אין לו אנשים בכלל
-            updated = 0
-            for table in tables_cursor:
-                table_number = table["table_number"]
-                people_ids = table_to_people.get(table_number, [])  # רשימה ריקה אם אין
-
-                result = self._handle_db_operation(
-                    tables_collection.update_one,
-                    {
-                        "_id": table["_id"]
-                    },
-                    {
-                        "$set": {"people_list": people_ids}
-                    }
-                )
-                updated += result.modified_count
-
-            return Response(
-                status=ResponseStatus.SUCCESS,
-                data={"updated_tables": updated}
-            )
+            return Response(status=ResponseStatus.SUCCESS)
 
         except Exception as e:
             return Response(

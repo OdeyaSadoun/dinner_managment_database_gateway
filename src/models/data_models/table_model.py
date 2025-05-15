@@ -9,7 +9,7 @@ from globals.consts.const_strings import ConstStrings
 
 class TableModel(BaseModel):
     id: Optional[ObjectId] = Field(default_factory=ObjectId, alias=ConstStrings.id_before_serialization) 
-    people_list: List[PersonModel] = Field(default_factory=list)  
+    people_list: List[str] = Field(default_factory=list)  
     position: Dict[str, int] = Field(default_factory=lambda: {"x": 0, "y": 0})  
     chairs: int = Field(default=12)
     table_number: int
