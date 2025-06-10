@@ -62,6 +62,7 @@ class UserController:
 
     def login(self, login_data: LoginUser) -> Response:
         try:
+            print("login")
             user = self._handle_db_operation(
                 self.collection.find_one,
                 {DataConstStrings.username_key: login_data.get(
